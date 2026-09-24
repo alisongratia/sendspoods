@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Spood Beanie Ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bagel+Fat+One&family=Figtree:wght@400;600;800&family=Gaegu:wght@700&family=Lilita+One&family=Luckiest+Guy&display=swap">
+<style>
+:root{
+  --ground:#FFE872;--ground-2:#FFF4B8;--paper:#FFFDF3;--ink:#2A1636;--ink-soft:#5B4768;--pink:#FF6FAE;--ok:#1F8A55;
+  --display:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hand:"Gaegu","Comic Sans MS","Chalkboard SE",cursive;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;padding-inline:16px}
+.wrap{max-width:1100px;margin-inline:auto;padding-block:28px 60px}
+a{color:inherit}
+h1,h2{font-family:var(--display);font-weight:400;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(38px,6vw,64px)}
+.lede{max-width:62ch;color:var(--ink-soft);margin:10px 0 0}
+.back{font-weight:700;text-decoration:none;display:inline-block;margin-bottom:14px}
+.rules{margin-top:22px;background:var(--paper);border:2.5px solid var(--ink);border-radius:18px;padding:16px 20px;max-width:760px}
+.rules h3{margin:0 0 6px;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.rules ul{margin:0;padding-left:20px}
+.options{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:28px;margin-top:30px}
+.opt{background:var(--paper);border:3px solid var(--ink);border-radius:26px;box-shadow:8px 8px 0 var(--ink);padding:22px;display:grid;gap:14px;align-content:start}
+.opt-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.opt-head .tag{font-family:var(--display);background:var(--pink);border:2.5px solid var(--ink);border-radius:999px;padding:2px 14px;font-size:18px}
+.opt h2{font-size:clamp(24px,3vw,32px)}
+.opt p{margin:0;color:var(--ink-soft)}
+.font{font-size:14px;color:var(--ink-soft)}
+.font b{color:var(--ink)}
+.beanie{background:var(--ground-2);border-radius:18px;padding:10px;line-height:0}
+.beanie svg{width:100%;height:auto}
+.colors{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.colors span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--ink-soft);margin-right:4px}
+.swatch{width:32px;height:32px;border-radius:50%;border:2.5px solid var(--ink);cursor:pointer;padding:0}
+.swatch[aria-pressed="true"]{outline:3px solid var(--pink);outline-offset:2px}
+.checks{display:flex;gap:6px;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.checks li{font-size:13px;font-weight:700;border:1.5px solid var(--ok);color:var(--ok);border-radius:999px;padding:2px 10px;background:#fff}
+.checks li.warn{border-color:#B3261E;color:#B3261E}
+.note{font-family:var(--hand);font-size:21px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← back to sendspoods</a>
+  <h1>Spood Beanie Ideas</h1>
+  <p class="lede">Four embroidered cuff designs made to fit embroidery rules: bold letters, thick lines, and only 2–3 thread colors. Tap the dots to try each one on a different beanie color.</p>
+
+  <div class="rules">
+    <h3>Designed to Fourthwall’s embroidery guidelines</h3>
+    <ul>
+      <li>At most 6 thread colors (these use 2–3)</li>
+      <li>Capital letters at least 0.3 in tall; lines and gaps at least 0.05 in</li>
+      <li>Solid shapes only: no gradients, shadows or tiny details</li>
+      <li>Sized for a front cuff area of about 5 × 2 in. Check the exact area in Fourthwall’s designer before ordering.</li>
+    </ul>
+  </div>
+
+  <div class="options" id="options"></div>
+
+  <p class="note">Tell Claude which one you like (A, B, C or D) and the beanie color. Claude will then make the finished embroidery file.</p>
+</div>
+
+<script>
+(function(){
+  // 100 units = 1 inch. The cuff design area is 500 x 200 (about 5 x 2 in).
+  var YARNS=[
+    {name:'Black',c:'#1C1A20',dark:true},
+    {name:'Navy',c:'#1E2A4A',dark:true},
+    {name:'Forest',c:'#1F4A36',dark:true},
+    {name:'Maroon',c:'#5A1E2C',dark:true},
+    {name:'Heather grey',c:'#B9B6BE',dark:false},
+    {name:'Mustard',c:'#D9A627',dark:false},
+    {name:'Pink',c:'#F4A7C6',dark:false}
+  ];
+  var THREAD={yellow:'#FFE872',pink:'#FF6FAE',white:'#FFFFFF',ink:'#2A1636'};
+
+  // Embroidery-friendly spider: solid body, thick legs, big eye dots. Drawn at (x,y), size s (units).
+  function stitchSpider(x,y,s,body,eyes){
+    var k=s/100, g='<g transform="translate('+x+','+y+') scale('+k+')">';
+    var legs=[[-18,-12,-44,-40,-58,-22],[-20,-4,-50,-8,-64,10],[-18,4,-48,16,-58,40],[-14,10,-36,34,-40,56]];
+    legs.forEach(function(l){[1,-1].forEach(function(d){
+      g+='<path d="M0 0 Q'+(d*l[0]*1.6)+' '+(l[1]*1.4)+' '+(d*l[2])+' '+l[3]+' L'+(d*l[4])+' '+l[5]+'" fill="none" stroke="'+body+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>';
+    });});
+    g+='<ellipse cx="0" cy="26" rx="24" ry="22" fill="'+body+'"/><circle cx="0" cy="-4" r="22" fill="'+body+'"/>';
+    g+='<circle cx="-9" cy="-6" r="8" fill="'+eyes+'"/><circle cx="9" cy="-6" r="8" fill="'+eyes+'"/>';
+    return g+'</g>';
+  }
+  function fitText(id){
+    // shrink any line that runs wider than its box, so the mockup stays honest with any font
+    document.querySelectorAll('[data-fit]').forEach(function(t){
+      var max=+t.getAttribute('data-fit'), w=t.getComputedTextLength();
+      if(w>max){var fs=parseFloat(t.getAttribute('font-size'))*max/w;t.setAttribute('font-size',fs.toFixed(1));}
+    });
+  }
+  function txt(x,y,size,s,fill,fam,fit,extra){
+    return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-family="'+fam+'" font-size="'+size+'" fill="'+fill+'" data-fit="'+fit+'"'+(extra||'')+'>'+s+'</text>';
+  }
+
+  var DESIGNS=[
+    {id:'A',title:'Spood Rescue',font:'Bagel Fat One',blurb:'Your rescue-squad name in big, chunky letters with a little spider leading the way.',
+     art:function(y){var main=y.dark?THREAD.yellow:THREAD.ink, acc=THREAD.pink;
+       return stitchSpider(66,92,104,acc,y.dark?THREAD.ink:THREAD.white)+txt(318,96,74,'SPOOD',main,'Bagel Fat One, sans-serif',300)+txt(318,176,74,'RESCUE',main,'Bagel Fat One, sans-serif',300);},
+     colors:function(y){return y.dark?['yellow','pink','ink']:['ink','pink','white'];}},
+    {id:'B',title:'Boop the Spood',font:'Luckiest Guy',blurb:'Playful comic-book letters. The spider sits in the middle like it’s waiting for its boop.',
+     art:function(y){var main=y.dark?THREAD.white:THREAD.ink;
+       return txt(100,126,80,'BOOP',THREAD.pink,'Luckiest Guy, sans-serif',165)+stitchSpider(250,88,90,main,y.dark?THREAD.ink:THREAD.white)+txt(402,126,80,'SPOOD',main,'Luckiest Guy, sans-serif',175);},
+     colors:function(y){return y.dark?['pink','white','ink']:['pink','ink','white'];}},
+    {id:'C',title:'8 Legs, 0 Problems',font:'Alfa Slab One',blurb:'Bold slab letters that read clearly from across the room, like a team name.',
+     art:function(y){var main=y.dark?THREAD.white:THREAD.ink;
+       return txt(250,92,58,'8 LEGS',y.dark?THREAD.yellow:THREAD.white,'Alfa Slab One, serif',440,y.dark?'':' stroke="'+THREAD.ink+'" stroke-width="7" paint-order="stroke"')+txt(250,164,58,'0 PROBLEMS',main,'Alfa Slab One, serif',440);},
+     colors:function(y){return y.dark?['yellow','white']:['white','ink'];}},
+    {id:'D',title:'sendspoods',font:'Lilita One',blurb:'The site’s name as a clean logo, with a spider hanging from its thread. Simple and classic.',
+     art:function(y){var main=y.dark?THREAD.white:THREAD.ink;
+       return '<path d="M444 14 V58" stroke="'+main+'" stroke-width="6" stroke-linecap="round"/>'+stitchSpider(444,82,70,THREAD.pink,y.dark?THREAD.ink:THREAD.white)+
+         txt(200,128,82,'sendspoods',main,'Lilita One, sans-serif',330);},
+     colors:function(y){return y.dark?['white','pink','ink']:['ink','pink','white'];}}
+  ];
+
+  function beanie(d,y){
+    var knit='';for(var x=60;x<=540;x+=24) knit+='<path d="M'+x+' 300 Q'+(x+6)+' 190 '+(x+2)+' 90" stroke="rgba(255,255,255,'+(y.dark?.06:.22)+')" stroke-width="8" fill="none"/>';
+    var ribs='';for(var x2=34;x2<=566;x2+=14) ribs+='<path d="M'+x2+' 300 V496" stroke="rgba('+(y.dark?'255,255,255,.07':'0,0,0,.07')+')" stroke-width="5"/>';
+    return '<svg viewBox="0 0 600 520" role="img" aria-label="Design '+d.id+' on a '+y.name.toLowerCase()+' beanie">'+
+      '<circle cx="300" cy="46" r="42" fill="'+y.c+'" stroke="#2A1636" stroke-width="5"/>'+
+      '<path d="M48 310 Q48 70 300 62 Q552 70 552 310 Z" fill="'+y.c+'" stroke="#2A1636" stroke-width="5"/>'+knit+
+      '<rect x="24" y="296" width="552" height="204" rx="26" fill="'+y.c+'" stroke="#2A1636" stroke-width="5"/>'+ribs+
+      '<g transform="translate(50,298)">'+d.art(y)+'</g>'+
+      '</svg>';
+  }
+
+  var host=document.getElementById('options');
+  DESIGNS.forEach(function(d){
+    var sec=document.createElement('section'); sec.className='opt';
+    var current=YARNS[0];
+    sec.innerHTML='<div class="opt-head"><span class="tag">'+d.id+'</span><h2>'+d.title+'</h2></div>'+
+      '<p>'+d.blurb+'</p><p class="font">Font: <b>'+d.font+'</b> (free Google font)</p>'+
+      '<div class="beanie"></div>'+
+      '<div class="colors"><span>Beanie color</span>'+YARNS.map(function(y,i){return '<button class="swatch" type="button" data-i="'+i+'" style="background:'+y.c+'" aria-label="'+y.name+'" aria-pressed="false"></button>';}).join('')+'</div>'+
+      '<ul class="checks"></ul>';
+    host.appendChild(sec);
+    function draw(){
+      sec.querySelector('.beanie').innerHTML=beanie(d,current);
+      fitText();
+      // report the real cap height of the smallest line: Bagel/Luckiest/Alfa/Lilita caps are ~0.7 of font size
+      var sizes=[].map.call(sec.querySelectorAll('text'),function(t){return parseFloat(t.getAttribute('font-size'));});
+      var capIn=(Math.min.apply(null,sizes)*0.7/100).toFixed(2);
+      var n=d.colors(current).length;
+      var sizeOk=capIn>=0.3;
+      sec.querySelector('.checks').innerHTML='<li>✓ '+n+' thread colors</li><li'+(sizeOk?'':' class="warn"')+'>'+(sizeOk?'✓':'!')+' letters about '+capIn+' in tall'+(sizeOk?'':' (min 0.3)')+'</li><li>✓ fits 5 × 2 in</li>';
+      sec.querySelectorAll('.swatch').forEach(function(b){b.setAttribute('aria-pressed',YARNS[+b.dataset.i]===current?'true':'false');});
+    }
+    sec.querySelector('.colors').addEventListener('click',function(e){var b=e.target.closest('.swatch');if(!b)return;current=YARNS[+b.dataset.i];draw();});
+    draw();
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+  });
+})();
+</script>
+</body>
+</html>
