@@ -21,9 +21,16 @@ New submissions are hidden until you approve them.
 3. Change the row's `status` from `pending` to `approved` (or `rejected`) and save. It appears on the site on the next page load.
 4. Optional: fill in `featured_story` with a fun line. It's shown if that spood becomes Spood of the Day.
 
-## Sender collections
+## Accounts and collections
 
-Senders can add an optional name (like `@mothqueen`) when they send a spood. It's saved in the `sender_handle` column, and each approved spood's card links to that sender's page at `collection.html?by=<name>`. `collection.html` on its own lists every named sender. There are no accounts, so anyone can type any name; check it when approving, and edit or clear `sender_handle` in the Table Editor if needed.
+Senders can sign in with an emailed link (no password) and claim a unique sender name like `@mothqueen`. Spoods they send while signed in carry their name, show "sent by @name" on the gallery card, and appear on their page at `collection.html?by=<name>`. On their own page they also see their spoods that are still waiting for approval. `collection.html` on its own lists every named sender. Sending without signing in still works; those spoods just have no sender name.
+
+Names live in `spood_profiles` (one per person, can't be changed from the site). Submissions link to the sender with `user_id` and `sender_handle`.
+
+**Setup needed in Supabase (Urban Exposed project):**
+
+1. **Authentication → URL Configuration → Redirect URLs:** add `https://alisongratia.github.io/sendspoods/**` so sign-in links return to sendspoods.
+2. **Authentication → Emails → SMTP Settings:** Supabase's built-in email only sends to members of your Supabase team. To let the public sign in, connect an email service here (for example Resend or Brevo).
 
 ## Identifying spiders
 

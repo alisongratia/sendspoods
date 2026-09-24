@@ -113,6 +113,10 @@ header.col-head{padding-block:26px 30px;display:grid;gap:8px}
 .col-head h1{font-family:var(--display);font-weight:400;line-height:1.02;margin:0;font-size:clamp(44px,7vw,80px);overflow-wrap:anywhere}
 .col-head .lede{font-size:19px;color:var(--ink-soft);max-width:52ch}
 .strip{margin-bottom:34px}
+.waiting{background:var(--paper);border:2.5px dashed var(--line);border-radius:24px;padding:22px;margin-bottom:34px}
+.waiting h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0}
+.waiting > p{color:var(--ink-soft);margin:4px 0 14px}
+.state{position:absolute;top:-12px;right:-8px;background:var(--ground);border:2px solid var(--line);border-radius:999px;padding:2px 10px;font-family:var(--hand);font-weight:700;font-size:16px;transform:rotate(6deg);z-index:1}
 .empty{font-family:var(--hand);font-size:24px;padding-block:20px}
 .senders{display:flex;flex-wrap:wrap;gap:10px;padding:0;margin:0;list-style:none}
 .senders a{display:inline-flex;gap:8px;align-items:center;text-decoration:none;font-weight:800;background:var(--paper);border:2.5px solid var(--line);border-radius:999px;padding:6px 16px}
@@ -134,6 +138,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     <div class="nav-links">
       <a href="./#gallery">Gallery</a>
       <a href="shop.html">Merch</a>
+      <button class="acct-btn" id="acctBtn" type="button">Sign in</button>
       <a class="btn" href="./#send">Send a spood</a>
     </div>
   </nav>
@@ -151,6 +156,11 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     <div><b id="stSince">–</b><span>sending since</span></div>
   </div>
 
+  <section class="waiting" id="waiting" hidden>
+    <h2>Waiting for approval</h2>
+    <p>Only you can see these. They join your collection once they’re checked.</p>
+    <div class="grid" id="waitGrid"></div>
+  </section>
   <div class="grid" id="grid"></div>
   <ul class="senders" id="senders" hidden></ul>
 
@@ -163,10 +173,13 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
 
 <script src="spood-art.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="spood-account.js"></script>
 <script>
 (function(){
   var sb=(window.supabase&&window.supabase.createClient)
-    ?window.supabase.createClient('https://uupdhdyxlppntfxmmwct.supabase.co','sb_publishable_L25cBrz92G46Q8r9SiUlsg_l8xJ4CyB'):null;
+    ?window.supabase.createClient('https://uupdhdyxlppntfxmmwct.supabase.co','sb_publishable_L25cBrz92G46Q8r9SiUlsg_l8xJ4CyB',{auth:{flowType:'implicit'}}):null;
+  var acct=(sb&&window.SpoodAccount)?SpoodAccount.init(sb):null;
+  if(acct) acct.bindButton(document.getElementById('acctBtn')); else document.getElementById('acctBtn').hidden=true;
   var palettes=['#7CCBFF','#FF9FCB','#9BE3B9','#FFD66B','#C9B6FF','#FFB38A'];
   var tilts=['-2.5deg','1.8deg','-1deg','2.6deg','-1.8deg','1deg','-2.2deg','2deg'];
   var grid=document.getElementById('grid'), spoods=[];
@@ -210,7 +223,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     document.getElementById('colTitle').textContent='@'+handle;
     document.getElementById('colEyebrow').textContent='spood collection';
     sb.from('spood_submissions').select('id,name,species,where_found,photo_path,boops,created_at')
-      .eq('sender_handle',handle).order('created_at',{ascending:false}).limit(500)
+      .eq('sender_handle',handle).eq('status','approved').order('created_at',{ascending:false}).limit(500)
       .then(function(r){
         if(r.error){lede('We couldn’t load this collection. Please try again in a moment.');return;}
         spoods=r.data;
@@ -226,7 +239,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   }
   function showSenders(){
     document.getElementById('colEyebrow').textContent='the people behind the spoods';
-    sb.from('spood_submissions').select('sender_handle').not('sender_handle','is',null).limit(2000).then(function(r){
+    sb.from('spood_submissions').select('sender_handle').eq('status','approved').not('sender_handle','is',null).limit(2000).then(function(r){
       if(r.error){lede('We couldn’t load the spood senders. Please try again in a moment.');return;}
       var counts={};r.data.forEach(function(x){counts[x.sender_handle]=(counts[x.sender_handle]||0)+1;});
       var names=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]||a.localeCompare(b);});
@@ -249,6 +262,25 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       if(r.data<hoped) say(s.name+' is feeling very booped today. Come back tomorrow!');
     });
   });
+
+  function showWaiting(st){
+    var box=document.getElementById('waiting');
+    if(!handle||!st.profile||st.profile.handle!==handle){box.hidden=true;return;}
+    sb.from('spood_submissions').select('id,name,species,where_found,photo_path,boops,status,created_at')
+      .eq('user_id',st.user.id).neq('status','approved').order('created_at',{ascending:false}).then(function(r){
+        if(r.error||!r.data.length){box.hidden=true;return;}
+        var rows=r.data;
+        return sb.storage.from('spoods').createSignedUrls(rows.map(function(x){return x.photo_path;}),60*60).then(function(u){
+          var urls={};(u.data||[]).forEach(function(x){if(x.signedUrl) urls[x.path]=x.signedUrl;});
+          document.getElementById('waitGrid').innerHTML=rows.map(function(x,i){
+            x.img=urls[x.photo_path];
+            return card(x,i).replace('<span class="tape" aria-hidden="true"></span>','<span class="state">'+(x.status==='rejected'?'not approved':'waiting')+'</span>').replace(/<div class="row">[\s\S]*<\/div>/,'');
+          }).join('');
+          box.hidden=false;
+        });
+      });
+  }
+  if(acct) acct.onChange(showWaiting);
 
   if(!sb){lede('We couldn’t reach spood HQ. Check your connection and try again.');return;}
   if(handle) showCollection(); else showSenders();

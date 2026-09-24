@@ -224,6 +224,8 @@ form input[type=text],form select{border:2px solid #2A1636;border-radius:12px;pa
 .vibes input:checked + span{background:#2A1636;color:#FFE872}
 .vibes input:focus-visible + span{outline:3px dashed #2A1636;outline-offset:2px}
 .filepick{border:2px dashed #2A1636;border-radius:12px;padding:12px;text-align:center;cursor:pointer;font-family:var(--hand);font-size:20px;background:#FFF4B8;color:#2A1636}
+.sender-box{background:#FFF4B8;border:2px dashed #2A1636;border-radius:12px;padding:10px 12px;font-size:15px;color:#2A1636}
+.sender-box button{font:inherit;font-weight:800;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;color:#2A1636}
 .handle-wrap{display:flex;align-items:center;border:2px solid #2A1636;border-radius:12px;background:#fff;padding-left:12px;color:#2A1636;font-weight:800}
 .handle-wrap input{border:0!important;border-radius:0 12px 12px 0!important;padding-left:4px!important;outline-offset:0}
 form small.hint{font-weight:500;color:#5B4768;font-size:13px}
@@ -282,6 +284,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       <a href="#sotd">Spood of the Day</a>
       <a href="#hall">Hall of Legs</a>
       <a href="#shop">Merch</a>
+      <button class="acct-btn" id="acctBtn" type="button">Sign in</button>
       <a class="btn" href="#send">Send a spood</a>
     </div>
   </nav>
@@ -399,10 +402,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         <label for="where">Where’d you find them?
           <input type="text" id="where" placeholder="on the bathroom ceiling, judging me" autocomplete="off">
         </label>
-        <label for="senderHandle">Your spood-sender name (optional)
-          <span class="handle-wrap"><span aria-hidden="true">@</span><input type="text" id="senderHandle" maxlength="24" placeholder="mothqueen" autocomplete="nickname" autocapitalize="none" spellcheck="false"></span>
-          <small class="hint">Letters, numbers and _ only. Your spoods get collected on your own page.</small>
-        </label>
+        <div class="sender-box" id="senderBox"></div>
         <fieldset class="vibes">
           <legend>Vibe check</legend>
           <label><input type="checkbox" id="v1" name="vibe" value="fuzzy" checked><span>fuzzy</span></label>
@@ -452,6 +452,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
 
 <script src="spood-art.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="spood-account.js"></script>
 <script>
 (function(){
   // ---------- spood drawing ----------
@@ -566,7 +567,9 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   // ---------- live data (Supabase: the "spoods" bucket and spood_ tables) ----------
   var SB_URL='https://uupdhdyxlppntfxmmwct.supabase.co';
   var SB_KEY='sb_publishable_L25cBrz92G46Q8r9SiUlsg_l8xJ4CyB';
-  var sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY):null;
+  var sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY,{auth:{flowType:'implicit'}}):null;
+  var acct=(sb&&window.SpoodAccount)?SpoodAccount.init(sb):null;
+  if(acct) acct.bindButton(document.getElementById('acctBtn')); else document.getElementById('acctBtn').hidden=true;
   var live=false, sotdId=null;
   var EXAMPLE_STATS={spoods:12408,boops:318770};
   function totalBoops(){return spoods.reduce(function(t,x){return t+x.boops;},0);}
@@ -582,6 +585,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     if(!sb) return;
     sb.from('spood_submissions')
       .select('id,name,species,where_found,filter_tags,vibes,photo_path,boops,featured_story,created_at,sender_handle')
+      .eq('status','approved')
       .order('created_at',{ascending:false}).limit(200)
       .then(function(res){
         if(res.error){console.warn('spoods',res.error);return;}
@@ -772,11 +776,15 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     if(!k) return {name:'Mystery spood',f:'all'};
     return {name:typed?withKind(typed,k.kind):k.kind,f:k.f};
   }
-  function cleanHandle(v){
-    v=(v||'').trim().replace(/^@/,'').toLowerCase();
-    return /^[a-z0-9_]{2,24}$/.test(v)?v:'';
+  var senderBox=document.getElementById('senderBox');
+  function paintSender(st){
+    if(!acct){senderBox.hidden=true;return;}
+    if(st.profile) senderBox.innerHTML='Sending as <b>@'+esc(st.profile.handle)+'</b>. This spood goes into your collection.';
+    else if(st.user) senderBox.innerHTML='Signed in. <button type="button" data-acct>Pick your sender name</button> to add this spood to your collection.';
+    else senderBox.innerHTML='Want this in your own collection? <button type="button" data-acct>Sign in</button> first (optional).';
   }
-  try{ var savedHandle=localStorage.getItem('spoodHandle'); if(savedHandle) document.getElementById('senderHandle').value=savedHandle; }catch(err){}
+  senderBox.addEventListener('click',function(e){if(e.target.closest('[data-acct]')) acct.open();});
+  if(acct) acct.onChange(paintSender); else paintSender({});
   var sendBtn=document.getElementById('sendBtn');
   document.getElementById('sendForm').addEventListener('submit',function(e){
     e.preventDefault();
@@ -785,9 +793,8 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     if(!sb){say('We couldn’t reach spood HQ. Check your connection and try again.');return;}
     var sp=chosenSpecies();
     var name=document.getElementById('spoodName').value.trim()||funNames[Math.floor(Math.random()*funNames.length)];
-    var handle=cleanHandle(document.getElementById('senderHandle').value);
-    if(document.getElementById('senderHandle').value.trim()&&!handle){say('Sender names can use letters, numbers and _ (2 to 24 characters).');return;}
-    try{ if(handle) localStorage.setItem('spoodHandle',handle); }catch(err){}
+    var me=acct?acct.state():{};
+    var mine=!!(me.user&&me.profile);
     var vibes=[].map.call(form.querySelectorAll('input[name=vibe]:checked'),function(x){return x.value;});
     sendBtn.disabled=true; sendBtn.textContent='Sending…';
     function done(){sendBtn.disabled=false;sendBtn.textContent='Send this spood';}
@@ -803,13 +810,13 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
           filter_tags:sp.f,
           vibes:vibes,
           photo_path:path,
-          sender_handle:handle||null
+          user_id:mine?me.user.id:null,
+          sender_handle:mine?me.profile.handle:null
         });
       }).then(function(ins){if(ins.error) throw ins.error;});
     }).then(function(){
-      var keepHandle=document.getElementById('senderHandle').value;
-      form.reset(); document.getElementById('senderHandle').value=keepHandle; setPending(null); speciesSel.dispatchEvent(new Event('change')); done();
-      say('Thanks! '+name+' is waiting for approval and will join the gallery once it’s checked.',6000);
+      form.reset(); setPending(null); speciesSel.dispatchEvent(new Event('change')); done();
+      say('Thanks! '+name+' is waiting for approval and will join the gallery once it’s checked.'+(mine?' You can see it waiting in your collection.':''),6000);
     }).catch(function(err){
       console.warn('send failed',err); done();
       say(err&&err.friendly||'That spood didn’t send. Please try again in a moment.',5000);
