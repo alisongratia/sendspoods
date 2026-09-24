@@ -21,6 +21,10 @@ New submissions are hidden until you approve them.
 3. Change the row's `status` from `pending` to `approved` (or `rejected`) and save. It appears on the site on the next page load.
 4. Optional: fill in `featured_story` with a fun line. It's shown if that spood becomes Spood of the Day.
 
+## Sender collections
+
+Senders can add an optional name (like `@mothqueen`) when they send a spood. It's saved in the `sender_handle` column, and each approved spood's card links to that sender's page at `collection.html?by=<name>`. `collection.html` on its own lists every named sender. There are no accounts, so anyone can type any name; check it when approving, and edit or clear `sender_handle` in the Table Editor if needed.
+
 ## Identifying spiders
 
 When checking a submission's species before approving it:

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A spood sender’s collection of glorious spiders on sendspoods.">
+<title>Spood Collection</title>
+<style>
+:root{
+  --ground:#FFE872;
+  --ground-2:#FFF4B8;
+  --paper:#FFFDF3;
+  --ink:#2A1636;
+  --ink-soft:#5B4768;
+  --pink:#FF6FAE;
+  --leaf:#2FAE6E;
+  --sky:#7CCBFF;
+  --line:#2A1636;
+  --shadow:#2A1636;
+  --web:rgba(42,22,54,.28);
+  --display:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hand:"Gaegu","Comic Sans MS","Chalkboard SE",cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#1C1026;
+    --ground-2:#281838;
+    --paper:#33214A;
+    --ink:#FFF2C4;
+    --ink-soft:#CDB9DD;
+    --pink:#FF7DB7;
+    --leaf:#4FD08E;
+    --sky:#86D1FF;
+    --line:#FFF2C4;
+    --shadow:#0B0510;
+    --web:rgba(255,242,196,.22);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#1C1026;
+  --ground-2:#281838;
+  --paper:#33214A;
+  --ink:#FFF2C4;
+  --ink-soft:#CDB9DD;
+  --pink:#FF7DB7;
+  --leaf:#4FD08E;
+  --sky:#86D1FF;
+  --line:#FFF2C4;
+  --shadow:#0B0510;
+  --web:rgba(255,242,196,.22);
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;padding-inline:16px;overflow-x:hidden}
+.wrap{max-width:1160px;margin-inline:auto}
+h1{font-family:var(--display);font-weight:400;line-height:1.02;margin:0;text-wrap:balance;font-size:clamp(46px,7vw,84px)}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px dashed var(--pink);outline-offset:3px}
+/* ---------- nav ---------- */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px;flex-wrap:wrap}
+.logo{display:flex;align-items:flex-start;gap:4px;text-decoration:none;font-family:var(--display);font-size:30px;letter-spacing:-.5px;position:relative}
+.logo .dot{color:var(--pink)}
+.logo-spood{width:34px;height:64px;margin-top:-18px;transform-origin:50% 0;animation:dangle 3.2s ease-in-out infinite}
+@keyframes dangle{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.nav-links{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.nav-links a{text-decoration:none;font-weight:600;padding:6px 12px;border-radius:999px}
+.nav-links a:hover{background:var(--ground-2)}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--display);font-size:18px;letter-spacing:.2px;
+  background:var(--pink);color:#2A1636;border:2.5px solid var(--line);
+  padding:10px 20px;border-radius:999px;cursor:pointer;text-decoration:none;
+  box-shadow:4px 4px 0 var(--shadow);transition:transform .12s, box-shadow .12s;
+}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--shadow)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+
+/* ---------- counter strip ---------- */
+.strip{background:var(--ink);color:var(--ground);border-radius:22px;padding:18px 24px;display:flex;flex-wrap:wrap;justify-content:space-around;gap:14px 28px;text-align:center}
+.strip div{display:flex;flex-direction:column}
+.strip b{font-family:var(--display);font-weight:400;font-size:34px;font-variant-numeric:tabular-nums;line-height:1}
+.strip span{font-family:var(--hand);font-size:19px;opacity:.85}
+/* ---------- gallery ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:34px 26px;padding-top:8px}
+.card{
+  background:var(--paper);border:2.5px solid var(--line);border-radius:10px;padding:12px 12px 14px;
+  box-shadow:5px 5px 0 var(--shadow);transform:rotate(var(--tilt,0deg));transition:transform .2s;
+  display:flex;flex-direction:column;gap:10px;position:relative;
+}
+.card:hover{transform:rotate(0) translateY(-4px)}
+.card .pic{aspect-ratio:1/1;border-radius:6px;border:2px solid var(--line);display:grid;place-items:center;overflow:hidden;background:var(--bg,var(--sky))}
+.card .pic svg{width:86%;height:86%}
+.card .pic img{width:100%;height:100%;object-fit:cover}
+.card .pic{position:relative}
+.card .tape{position:absolute;top:-12px;left:50%;width:74px;height:22px;margin-left:-37px;background:var(--pink);opacity:.8;transform:rotate(-4deg);border-radius:2px}
+.card h4{margin:0;font-family:var(--hand);font-size:26px;line-height:1;font-weight:700}
+.card .sp{font-size:14px;color:var(--ink-soft);line-height:1.3}
+.card .row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px}
+.card .row .boop{margin-left:auto}
+.boop{border:2px solid var(--line);background:var(--ground-2);border-radius:999px;padding:3px 12px;cursor:pointer;font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
+.boop:hover{background:var(--pink);color:#2A1636}
+.card.booped .pic svg{animation:boing .5s}
+@keyframes boing{30%{transform:scale(1.12,.9)}60%{transform:scale(.94,1.08)}100%{transform:none}}
+.new-sticker{position:absolute;top:-14px;right:-10px;background:var(--leaf);color:#fff;font-family:var(--display);font-size:15px;border:2.5px solid var(--line);border-radius:999px;padding:3px 11px;transform:rotate(8deg);z-index:1}
+
+header.col-head{padding-block:26px 30px;display:grid;gap:8px}
+.col-head .hand{font-family:var(--hand);font-size:22px;font-weight:700;color:var(--ink-soft);transform:rotate(-2deg);display:inline-block;justify-self:start}
+.col-head h1{font-family:var(--display);font-weight:400;line-height:1.02;margin:0;font-size:clamp(44px,7vw,80px);overflow-wrap:anywhere}
+.col-head .lede{font-size:19px;color:var(--ink-soft);max-width:52ch}
+.strip{margin-bottom:34px}
+.empty{font-family:var(--hand);font-size:24px;padding-block:20px}
+.senders{display:flex;flex-wrap:wrap;gap:10px;padding:0;margin:0;list-style:none}
+.senders a{display:inline-flex;gap:8px;align-items:center;text-decoration:none;font-weight:800;background:var(--paper);border:2.5px solid var(--line);border-radius:999px;padding:6px 16px}
+.senders a:hover{background:var(--pink);color:#2A1636}
+.senders small{font-weight:600;color:var(--ink-soft)}
+footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--hand);font-size:19px;color:var(--ink-soft)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--ink);color:var(--ground);padding:12px 20px;border-radius:999px;font-weight:700;transition:transform .3s;z-index:9;max-width:calc(100% - 32px);text-align:center}
+.toast.show{transform:translate(-50%,0)}
+@media (max-width:480px){.nav-links a:not(.btn){display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav" aria-label="Main">
+    <a class="logo" href="./" aria-label="sendspoods home">send<span class="dot">spoods</span>
+      <svg class="logo-spood" viewBox="0 0 34 64" aria-hidden="true"></svg>
+    </a>
+    <div class="nav-links">
+      <a href="./#gallery">Gallery</a>
+      <a href="shop.html">Merch</a>
+      <a class="btn" href="./#send">Send a spood</a>
+    </div>
+  </nav>
+
+  <header class="col-head">
+    <span class="hand" id="colEyebrow">spood collection</span>
+    <h1 id="colTitle">Spood Senders</h1>
+    <p class="lede" id="colLede">Loading spoods…</p>
+  </header>
+
+  <div class="strip" id="colStats" hidden>
+    <div><b id="stSpoods">0</b><span>spoods sent</span></div>
+    <div><b id="stLegs">0</b><span>legs counted</span></div>
+    <div><b id="stBoops">0</b><span>boops received</span></div>
+    <div><b id="stSince">–</b><span>sending since</span></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <ul class="senders" id="senders" hidden></ul>
+
+  <footer>
+    <a href="./">← back to sendspoods</a>
+    <a href="./#send">send your own spood →</a>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="spood-art.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var sb=(window.supabase&&window.supabase.createClient)
+    ?window.supabase.createClient('https://uupdhdyxlppntfxmmwct.supabase.co','sb_publishable_L25cBrz92G46Q8r9SiUlsg_l8xJ4CyB'):null;
+  var palettes=['#7CCBFF','#FF9FCB','#9BE3B9','#FFD66B','#C9B6FF','#FFB38A'];
+  var tilts=['-2.5deg','1.8deg','-1deg','2.6deg','-1.8deg','1deg','-2.2deg','2deg'];
+  var grid=document.getElementById('grid'), spoods=[];
+  var toast=document.getElementById('toast'), tt;
+  function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},2800);}
+  function esc(t){var d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML;}
+  function bgFor(id){var h=0;for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))|0;return palettes[Math.abs(h)%palettes.length];}
+
+  // logo spider
+  (function(){
+    var el=document.querySelector('.logo-spood'), c=getComputedStyle(document.documentElement).getPropertyValue('--line').trim()||'#2A1636';
+    el.innerHTML='<line x1="17" y1="0" x2="17" y2="40" stroke="'+c+'" stroke-width="1.5"/>'+
+      '<g transform="translate(0,30) scale(.17)">'+SpoodArt.spoodSVG({body:c,accent:'#FF6FAE'}).replace(/^<svg[^>]*>|<\/svg>$/g,'')+'</g>';
+  })();
+
+  var handle=((new URLSearchParams(location.search).get('by'))||'').trim().replace(/^@/,'').toLowerCase();
+  if(!/^[a-z0-9_]{2,24}$/.test(handle)) handle='';
+
+  function lede(t){document.getElementById('colLede').textContent=t;}
+  function card(s,i){
+    return '<article class="card" data-i="'+i+'" style="--tilt:'+tilts[i%tilts.length]+';--bg:'+bgFor(s.id)+'">'+
+      '<span class="tape" aria-hidden="true"></span>'+
+      '<div class="pic">'+(s.img?'<img src="'+s.img+'" alt="Photo of '+esc(s.name)+'" loading="lazy">':'')+'</div>'+
+      '<h4>'+esc(s.name)+'</h4>'+
+      '<p class="sp">'+esc(s.species)+' · found '+esc(s.where_found)+'</p>'+
+      '<div class="row"><button class="boop" type="button" aria-label="Boop '+esc(s.name)+'">boop · <span>'+s.boops.toLocaleString()+'</span></button></div>'+
+    '</article>';
+  }
+  function stats(){
+    var n=spoods.length, boops=spoods.reduce(function(t,x){return t+x.boops;},0);
+    var first=spoods.reduce(function(a,x){return x.created_at<a?x.created_at:a;},spoods[0].created_at);
+    document.getElementById('stSpoods').textContent=n.toLocaleString();
+    document.getElementById('stLegs').textContent=(n*8).toLocaleString();
+    document.getElementById('stBoops').textContent=boops.toLocaleString();
+    document.getElementById('stSince').textContent=new Date(first).toLocaleDateString(undefined,{month:'short',year:'numeric'});
+    document.getElementById('colStats').hidden=false;
+  }
+
+  function showCollection(){
+    document.title='@'+handle+'’s Spood Collection';
+    document.getElementById('colTitle').textContent='@'+handle;
+    document.getElementById('colEyebrow').textContent='spood collection';
+    sb.from('spood_submissions').select('id,name,species,where_found,photo_path,boops,created_at')
+      .eq('sender_handle',handle).order('created_at',{ascending:false}).limit(500)
+      .then(function(r){
+        if(r.error){lede('We couldn’t load this collection. Please try again in a moment.');return;}
+        spoods=r.data;
+        if(!spoods.length){lede('No approved spoods from @'+handle+' yet. New spoods show up here once they’re checked.');return;}
+        lede('Every glorious spood @'+handle+' has sent in, newest first.');
+        stats();
+        return sb.storage.from('spoods').createSignedUrls(spoods.map(function(x){return x.photo_path;}),60*60*24).then(function(u){
+          var urls={};(u.data||[]).forEach(function(x){if(x.signedUrl) urls[x.path]=x.signedUrl;});
+          spoods.forEach(function(x){x.img=urls[x.photo_path];});
+          grid.innerHTML=spoods.map(card).join('');
+        });
+      });
+  }
+  function showSenders(){
+    document.getElementById('colEyebrow').textContent='the people behind the spoods';
+    sb.from('spood_submissions').select('sender_handle').not('sender_handle','is',null).limit(2000).then(function(r){
+      if(r.error){lede('We couldn’t load the spood senders. Please try again in a moment.');return;}
+      var counts={};r.data.forEach(function(x){counts[x.sender_handle]=(counts[x.sender_handle]||0)+1;});
+      var names=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]||a.localeCompare(b);});
+      if(!names.length){lede('No named spood senders yet. Add your sender name when you send a spood to get your own collection page.');return;}
+      lede('Pick a sender to see their whole spood collection.');
+      var ul=document.getElementById('senders');
+      ul.innerHTML=names.map(function(n){return '<li><a href="collection.html?by='+encodeURIComponent(n)+'">@'+esc(n)+' <small>'+counts[n]+' spood'+(counts[n]===1?'':'s')+'</small></a></li>';}).join('');
+      ul.hidden=false;
+    });
+  }
+
+  grid.addEventListener('click',function(e){
+    var b=e.target.closest('.boop'); if(!b||!sb) return;
+    var card=b.closest('.card'), s=spoods[+card.dataset.i], span=b.querySelector('span'), hoped=s.boops+1;
+    s.boops=hoped; span.textContent=s.boops.toLocaleString(); stats();
+    card.classList.remove('booped'); void card.offsetWidth; card.classList.add('booped');
+    sb.rpc('spood_boop',{p_id:s.id}).then(function(r){
+      if(r.error||typeof r.data!=='number') return;
+      s.boops=r.data; span.textContent=s.boops.toLocaleString(); stats();
+      if(r.data<hoped) say(s.name+' is feeling very booped today. Come back tomorrow!');
+    });
+  });
+
+  if(!sb){lede('We couldn’t reach spood HQ. Check your connection and try again.');return;}
+  if(handle) showCollection(); else showSenders();
+})();
+</script>
+</body>
+</html>
