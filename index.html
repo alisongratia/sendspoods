@@ -268,6 +268,70 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   .two{grid-template-columns:1fr}
   .hero h1 .wiggle{-webkit-text-stroke:1.5px var(--line)}
 }
+
+/* ---------- phones ---------- */
+.fab{display:none}
+@media (max-width:560px){
+  body{font-size:16px}
+  .nav{flex-wrap:nowrap;padding-block:12px}
+  .logo{font-size:26px}
+  .nav-links{flex-wrap:nowrap;gap:4px}
+  .nav-links a{display:none}
+  .acct-btn{border:2px solid var(--line)!important;background:var(--paper)!important;font-size:14px!important;padding:6px 12px!important;white-space:nowrap;max-width:44vw;overflow:hidden;text-overflow:ellipsis}
+
+  .hero{gap:22px;padding-block:8px 34px}
+  .hero h1{font-size:clamp(44px,13vw,60px);margin-block:6px 12px}
+  .hero .lede{font-size:17px}
+  .hero-cta{display:grid;grid-template-columns:1fr;gap:10px}
+  .hero-cta .btn{justify-content:center}
+  .dropzone{max-width:250px;box-shadow:6px 6px 0 var(--shadow)}
+  .dz-inner{padding:14px}
+  .dz-inner strong{font-size:19px}
+  .dz-inner span{font-size:16px}
+  .dz-spood{height:110px;width:40px}
+
+  .strip{padding:14px 12px;gap:12px 10px;display:grid;grid-template-columns:1fr 1fr}
+  .strip b{font-size:28px}
+  section{padding-block:44px 4px}
+  .shead{margin-bottom:18px;gap:10px}
+
+  .sotd-art{min-height:260px}
+  .sotd-body{padding:22px 20px}
+  .facts dd{font-family:var(--body);font-weight:800;font-size:16px;line-height:1.3}
+  .quote{font-size:21px}
+
+  .chips{flex-wrap:nowrap;overflow-x:auto;margin-inline:-16px;padding:2px 16px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{white-space:nowrap;flex:none;padding:8px 14px}
+
+  .grid{grid-template-columns:1fr 1fr;gap:24px 14px}
+  .card{padding:8px 8px 10px;gap:6px;box-shadow:3px 3px 0 var(--shadow);border-width:2px}
+  .card h4{font-size:20px}
+  .card .sp{font-size:12.5px}
+  .card .by{font-size:12px}
+  .card .tape{width:52px;margin-left:-26px;height:16px;top:-9px}
+  .new-sticker{font-size:12px;padding:2px 8px;top:-12px;right:-6px}
+  .boop{padding:7px 12px;font-size:13px;min-height:36px}
+
+  .award{padding:14px}
+  .shop{grid-template-columns:1fr 1fr;gap:14px}
+  .item{border-radius:18px}
+  .item .info{padding:10px 12px 12px;gap:4px}
+  .item h4{font-size:17px}
+  .item p{font-size:13px}
+  .item .soon{font-size:16px}
+  .item .tag{font-size:13px;top:8px;right:8px;padding:1px 8px}
+  .more .btn{width:100%;justify-content:center}
+
+  .send{padding:18px;border-radius:24px;box-shadow:6px 6px 0 var(--shadow)}
+  form{padding:16px}
+  form input[type=text],form select{padding:12px;font-size:16px}
+  .mail{padding:18px;box-shadow:6px 6px 0 var(--shadow)}
+  .mail-row input{font-size:16px}
+
+  .fab{display:inline-flex;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;box-shadow:4px 4px 0 var(--shadow);transition:transform .2s,opacity .2s}
+  .fab.away{transform:translateY(140%);opacity:0;pointer-events:none}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
@@ -448,6 +512,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     <span>merch coming soon</span>
   </footer>
 </div>
+<a class="btn fab away" id="fab" href="#send">+ Send a spood</a>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="spood-art.js"></script>
@@ -838,6 +903,20 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       mailStatus.textContent=res.error?'You’re already on the list. The spoods remember you.':'You’re in! Spood Mail is on its way.';
     });
   });
+
+  // ---------- floating send button (phones) ----------
+  (function(){
+    var fab=document.getElementById('fab'), sendSec=document.getElementById('send'), hero=document.getElementById('top');
+    function update(){
+      var past=hero.getBoundingClientRect().bottom<0;
+      var r=sendSec.getBoundingClientRect(), atForm=r.top<innerHeight&&r.bottom>0;
+      var nudge=document.querySelector('.acct-nudge:not([hidden])');
+      fab.classList.toggle('away',!past||atForm||!!nudge);
+    }
+    addEventListener('scroll',update,{passive:true}); addEventListener('resize',update);
+    if(acct) acct.onChange(update);
+    update();
+  })();
 
   // ---------- boot ----------
   render(); renderSotd(); renderHall(); updateStats(); paintDecor(); drawWeb();

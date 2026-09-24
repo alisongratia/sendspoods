@@ -6,6 +6,7 @@
 <meta name="description" content="A spood sender’s collection of glorious spiders on sendspoods.">
 <title>Spood Collection</title>
 <style>
+[hidden]{display:none!important}
 :root{
   --ground:#FFE872;
   --ground-2:#FFF4B8;
@@ -125,7 +126,28 @@ header.col-head{padding-block:26px 30px;display:grid;gap:8px}
 footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--hand);font-size:19px;color:var(--ink-soft)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--ink);color:var(--ground);padding:12px 20px;border-radius:999px;font-weight:700;transition:transform .3s;z-index:9;max-width:calc(100% - 32px);text-align:center}
 .toast.show{transform:translate(-50%,0)}
-@media (max-width:480px){.nav-links a:not(.btn){display:none}}
+@media (max-width:560px){
+  .logo{font-size:26px}
+  .nav{flex-wrap:nowrap}
+  .nav-links{flex-wrap:nowrap}
+  .nav-links a{display:none}
+  .acct-btn{border:2px solid var(--line)!important;background:var(--paper)!important;font-size:14px!important;padding:6px 12px!important;white-space:nowrap;max-width:44vw;overflow:hidden;text-overflow:ellipsis}
+  .grid{grid-template-columns:1fr 1fr;gap:24px 14px}
+  .card{padding:8px 8px 10px;gap:6px;box-shadow:3px 3px 0 var(--shadow);border-width:2px}
+  .card h4{font-size:20px}
+  .card .sp{font-size:12.5px}
+  .card .tape{width:52px;margin-left:-26px;height:16px;top:-9px}
+  .boop{padding:7px 12px;font-size:13px;min-height:36px}
+  .strip{padding:14px 12px;gap:12px 10px;display:grid;grid-template-columns:1fr 1fr}
+  .strip b{font-size:28px}
+  .shop{grid-template-columns:1fr 1fr;gap:14px}
+  .item{border-radius:18px}
+  .item .info{padding:10px 12px 12px;gap:4px}
+  .item h4{font-size:17px}
+  .item p{font-size:13px}
+  .item .soon{font-size:16px}
+  .item .tag{font-size:13px;top:8px;right:8px;padding:1px 8px}
+}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -241,7 +263,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     document.getElementById('colEyebrow').textContent='the people behind the spoods';
     sb.from('spood_submissions').select('sender_handle').eq('status','approved').not('sender_handle','is',null).limit(2000).then(function(r){
       if(r.error){lede('We couldn’t load the spood senders. Please try again in a moment.');return;}
-      var counts={};r.data.forEach(function(x){counts[x.sender_handle]=(counts[x.sender_handle]||0)+1;});
+      var counts={};r.data.forEach(function(x){if(x.sender_handle) counts[x.sender_handle]=(counts[x.sender_handle]||0)+1;});
       var names=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]||a.localeCompare(b);});
       if(!names.length){lede('No named spood senders yet. Add your sender name when you send a spood to get your own collection page.');return;}
       lede('Pick a sender to see their whole spood collection.');

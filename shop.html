@@ -6,6 +6,7 @@
 <meta name="description" content="Spood merch: mugs, tees, stickers and more for people who love spiders.">
 <title>The Spood Shop</title>
 <style>
+[hidden]{display:none!important}
 :root{
   --ground:#FFE872;
   --ground-2:#FFF4B8;
@@ -99,7 +100,29 @@ header.shop-head{padding-block:26px 34px;display:grid;gap:10px}
 .item .btn{font-size:15px;padding:7px 14px;box-shadow:3px 3px 0 var(--shadow)}
 
 footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--hand);font-size:19px;color:var(--ink-soft)}
-@media (max-width:480px){.nav-links a:not(.btn){display:none}}
+@media (max-width:560px){
+  .logo{font-size:26px}
+  .nav{flex-wrap:nowrap}
+  .nav-links{flex-wrap:nowrap}
+  .nav-links a:not(.btn){display:none}
+  .nav-links .btn{font-size:15px;padding:7px 14px}
+  .acct-btn{border:2px solid var(--line)!important;background:var(--paper)!important;font-size:14px!important;padding:6px 12px!important;white-space:nowrap;max-width:44vw;overflow:hidden;text-overflow:ellipsis}
+  .grid{grid-template-columns:1fr 1fr;gap:24px 14px}
+  .card{padding:8px 8px 10px;gap:6px;box-shadow:3px 3px 0 var(--shadow);border-width:2px}
+  .card h4{font-size:20px}
+  .card .sp{font-size:12.5px}
+  .card .tape{width:52px;margin-left:-26px;height:16px;top:-9px}
+  .boop{padding:7px 12px;font-size:13px;min-height:36px}
+  .strip{padding:14px 12px;gap:10px 16px}
+  .strip b{font-size:28px}
+  .shop{grid-template-columns:1fr 1fr;gap:14px}
+  .item{border-radius:18px}
+  .item .info{padding:10px 12px 12px;gap:4px}
+  .item h4{font-size:17px}
+  .item p{font-size:13px}
+  .item .soon{font-size:16px}
+  .item .tag{font-size:13px;top:8px;right:8px;padding:1px 8px}
+}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
