@@ -21,6 +21,14 @@ New submissions are hidden until you approve them.
 3. Change the row's `status` from `pending` to `approved` (or `rejected`) and save. It appears on the site on the next page load.
 4. Optional: fill in `featured_story` with a fun line. It's shown if that spood becomes Spood of the Day.
 
+## Identifying spiders
+
+When checking a submission's species before approving it:
+
+- [BugGuide](https://bugguide.net/node/view/1954) (Iowa State University): photo guide for US and Canadian spiders.
+- [iNaturalist](https://www.inaturalist.org/pages/arachnids): community IDs from a photo, worldwide. Many spiders can only be identified to genus or family from a photo.
+- [World Spider Catalog](https://wsc.nmbe.ch/) (Natural History Museum of Bern): the reference for correct, current scientific names.
+
 ## Boops and Spood of the Day
 
 - Each boop is saved. One visitor can give a spood at most 30 boops a day.
