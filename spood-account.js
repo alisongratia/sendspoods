@@ -45,7 +45,7 @@
       '<div data-step="done" hidden>' +
         '<h2>You’re signed in</h2>' +
         '<p>Spoods you send now go straight into your collection as <b data-me></b>.</p>' +
-        '<div class="row"><a class="btn" data-mine href="collection.html">See my collection</a><button class="linkish" type="button" data-signout>Sign out</button></div>' +
+        '<div class="row"><a class="btn" data-mine href="collection.html">See my collection</a><button class="btn" type="button" data-signout>Sign out</button></div>' +
       '</div>' +
     '</dialog>';
 
