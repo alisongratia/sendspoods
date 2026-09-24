@@ -34,6 +34,10 @@ When checking a submission's species before approving it:
 - Each boop is saved. One visitor can give a spood at most 30 boops a day.
 - Spood of the Day is the approved spood with the most boops in the last 24 hours (ties go to the most boops overall).
 
+## Spood Mail
+
+Email sign-ups land in the **`spood_subscribers`** table (Supabase → Table Editor). The public can only add their own email; nobody can read the list from the site. To send a newsletter, export the table as CSV and import it into an email service (for example Buttondown or Mailchimp), which also handles unsubscribes.
+
 ## Shop
 
 The shop is still a preview: the cart only counts items and doesn't take payment.

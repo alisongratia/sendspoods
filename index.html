@@ -228,6 +228,17 @@ form input[type=text],form select{border:2px solid #2A1636;border-radius:12px;pa
 .filepick input{position:absolute;opacity:0;width:1px;height:1px}
 form .btn{justify-self:start;background:#2A1636;color:#FFE872;border-color:#2A1636;box-shadow:4px 4px 0 #FF6FAE}
 
+/* ---------- spood mail ---------- */
+.mail{display:grid;grid-template-columns:1fr 1.1fr;gap:28px;align-items:center;background:var(--sky);color:#2A1636;border:3px solid var(--line);border-radius:30px;padding:32px;box-shadow:10px 10px 0 var(--shadow)}
+.mail h2{font-size:clamp(34px,4.5vw,52px)}
+.mail p{font-size:18px;margin-top:8px}
+.mail-label{font-weight:800;font-size:14px;display:block;margin-bottom:6px}
+.mail-row{display:flex;gap:10px;flex-wrap:wrap}
+.mail-row input{flex:1 1 220px;min-width:0;border:2.5px solid #2A1636;border-radius:999px;padding:11px 16px;background:#fff;color:#2A1636;font:inherit}
+.mail .btn{background:#2A1636;color:#FFE872;border-color:#2A1636;box-shadow:4px 4px 0 #FF6FAE}
+.mail-status{font-family:var(--hand);font-size:20px;font-weight:700;min-height:1.3em;margin-top:8px}
+@media (max-width:860px){.mail{grid-template-columns:1fr;padding:22px}}
+
 /* ---------- spood code / footer ---------- */
 .code{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
 .code div{padding-top:12px;border-top:3px dotted var(--line)}
@@ -345,7 +356,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   <section id="shop">
     <div class="shead">
       <h2>Spood Merch</h2>
-      <p>coming soon · here’s a sneak peek</p>
+      <p>coming soon · <a href="#mail">join Spood Mail</a> for first dibs</p>
     </div>
     <div class="shop" id="shopGrid"></div>
     <div class="more"><a class="btn" href="shop.html">See all merch →</a></div>
@@ -393,6 +404,23 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         </fieldset>
         <button class="btn" type="submit" id="sendBtn">Send this spood</button>
         <p style="font-size:14px;color:#5B4768;margin:0">Every spood is checked by a human before it shows up in the gallery.</p>
+      </form>
+    </div>
+  </section>
+
+  <section id="mail">
+    <div class="mail">
+      <div>
+        <h2>Get Spood Mail</h2>
+        <p>New spoods, the latest Spood of the Day, and first dibs when the merch drops. No spam, just spiders.</p>
+      </div>
+      <form id="mailForm" novalidate>
+        <label for="mailEmail" class="mail-label">Your email</label>
+        <div class="mail-row">
+          <input type="email" id="mailEmail" placeholder="you@example.com" autocomplete="email" required>
+          <button class="btn" type="submit" id="mailBtn">Join Spood Mail</button>
+        </div>
+        <p class="mail-status" id="mailStatus" role="status" aria-live="polite"></p>
       </form>
     </div>
   </section>
@@ -761,6 +789,22 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     }).catch(function(err){
       console.warn('send failed',err); done();
       say(err&&err.friendly||'That spood didn’t send. Please try again in a moment.',5000);
+    });
+  });
+
+  // ---------- spood mail ----------
+  var mailForm=document.getElementById('mailForm'), mailStatus=document.getElementById('mailStatus'), mailBtn=document.getElementById('mailBtn');
+  mailForm.addEventListener('submit',function(e){
+    e.preventDefault();
+    var email=document.getElementById('mailEmail').value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){mailStatus.textContent='That email doesn’t look quite right. Check it and try again.';return;}
+    if(!sb){mailStatus.textContent='We couldn’t reach spood HQ. Check your connection and try again.';return;}
+    mailBtn.disabled=true; mailStatus.textContent='Signing you up…';
+    sb.from('spood_subscribers').insert({email:email}).then(function(res){
+      mailBtn.disabled=false;
+      if(res.error&&res.error.code!=='23505'){console.warn('spood mail',res.error);mailStatus.textContent='That didn’t work. Please try again in a moment.';return;}
+      mailForm.reset();
+      mailStatus.textContent=res.error?'You’re already on the list. The spoods remember you.':'You’re in! Spood Mail is on its way.';
     });
   });
 
