@@ -44,7 +44,7 @@
     {n:'I Brake for Spoods',d:'Weatherproof bumper sticker, 10 × 3 in. Tell the world.',bg:'#FF9FCB',k:'sticker'},
     {n:'Spider-Friendly Home Decal',d:'A window decal that lets everyone know: this home catches and releases.',bg:'#9BE3B9',k:'decal'},
     {n:'Queen Stripes Pin',d:'Hard enamel pin with a gold zigzag, just like her web.',bg:'#7CCBFF',k:'pin'},
-    {n:'Spood Rescue Cap',d:'An embroidered crew cap for the spood rescue squad.',bg:'#FFD66B',k:'cap'},
+    {n:'Spood Rescue Beanie',d:'A cozy knit beanie with a pom-pom and an embroidered spood rescue patch. For chilly-morning web checks.',bg:'#FFD66B',tag:'cozy',k:'beanie'},
     {n:'Peaches Plush',d:'Eight wiggly legs, two enormous eyes, fully huggable.',bg:'#C9B6FF',tag:'so soft',k:'plush'},
     {n:'Spood Catcher',d:'A long-handled catcher for gentle, no-touch relocations. In the works.',bg:'#FF9FCB',tag:'someday',k:'catcher'}
   ];
@@ -62,7 +62,15 @@
     if(k==='badge') return '<svg viewBox="0 0 200 160"><path d="M100 10 L150 28 L146 92 Q140 128 100 150 Q60 128 54 92 L50 28Z" fill="#FFFDF3" stroke="'+L+'" stroke-width="5" stroke-linejoin="round"/>'+T(100,42,9,'CERTIFIED')+sp('translate(82,48)',.18,{body:L,accent:'#FF6FAE',jumper:true})+T(100,104,13,'SPOOD','Bagel Fat One, sans-serif')+T(100,120,9,'RELOCATOR')+'<path d="M84 130 L100 138 L116 130" stroke="#FF6FAE" stroke-width="4" fill="none" stroke-linecap="round"/></svg>';
     if(k==='notes') return '<svg viewBox="0 0 200 160"><rect x="48" y="24" width="112" height="112" fill="#FFFDF3" stroke="'+L+'" stroke-width="3" transform="rotate(6 104 80)"/><rect x="42" y="18" width="112" height="112" fill="#FFF4B8" stroke="'+L+'" stroke-width="4" transform="rotate(-4 98 74)"/><g transform="rotate(-4 98 74)">'+T(98,46,14,'NOTICE','Bagel Fat One, sans-serif')+T(98,66,8,'You are being')+T(98,78,8,'relocated.')+T(98,94,8,'Nothing personal.')+T(98,114,8,'— Management')+'</g></svg>';
     if(k==='decal') return '<svg viewBox="0 0 200 160"><rect x="36" y="14" width="128" height="134" rx="4" fill="#DDF3FF" stroke="'+L+'" stroke-width="5"/><path d="M100 14 V148 M36 81 H164" stroke="'+L+'" stroke-width="5"/><circle cx="100" cy="81" r="34" fill="#FFFDF3" stroke="'+L+'" stroke-width="3"/>'+sp('translate(88,58)',.12,{body:L,accent:'#FF6FAE',jumper:true})+T(100,90,7,'SPIDER-FRIENDLY')+T(100,100,7,'HOME')+'</svg>';
-    if(k==='cap') return '<svg viewBox="0 0 200 160"><path d="M40 104 Q42 40 100 38 Q158 40 160 104 Z" fill="#2A1636"/><path d="M40 104 Q100 92 188 112 Q160 124 40 110 Z" fill="#2A1636" stroke="#FFFDF3" stroke-width="2"/><circle cx="100" cy="40" r="5" fill="#FF6FAE"/><rect x="66" y="58" width="68" height="32" rx="8" fill="#FFE872" stroke="#FFFDF3" stroke-width="2" stroke-dasharray="3 2"/>'+T(100,72,9,'SPOOD','Bagel Fat One, sans-serif')+T(100,84,8,'RESCUE')+'</svg>';
+    if(k==='beanie'){
+      var ribs='';for(var x=48;x<=152;x+=8) ribs+='<path d="M'+x+' 98 V132" stroke="rgba(255,255,255,.18)" stroke-width="3"/>';
+      var knit='';for(var x2=56;x2<=144;x2+=11) knit+='<path d="M'+x2+' 94 Q'+(x2+3)+' 70 '+(x2+1)+' 46" stroke="rgba(255,255,255,.08)" stroke-width="3" fill="none"/>';
+      return '<svg viewBox="0 0 200 160"><circle cx="100" cy="22" r="16" fill="#FF6FAE" stroke="'+L+'" stroke-width="3"/>'+
+        '<path d="M44 100 Q44 36 100 34 Q156 36 156 100 Z" fill="#2A1636"/>'+knit+
+        '<rect x="40" y="94" width="120" height="42" rx="10" fill="#2A1636" stroke="#FFFDF3" stroke-width="2"/>'+ribs+
+        '<rect x="70" y="100" width="60" height="30" rx="8" fill="#FFE872" stroke="#FFFDF3" stroke-width="2" stroke-dasharray="3 2"/>'+
+        sp('translate(74,103)',.1,{body:L,accent:'#FF6FAE',jumper:true})+T(110,114,8,'SPOOD','Bagel Fat One, sans-serif')+T(110,125,7,'RESCUE')+'</svg>';
+    }
     if(k==='catcher') return '<svg viewBox="0 0 200 160"><path d="M36 146 L104 78" stroke="'+L+'" stroke-width="8" stroke-linecap="round"/><path d="M36 146 L104 78" stroke="#FF6FAE" stroke-width="3" stroke-linecap="round"/><ellipse cx="124" cy="62" rx="30" ry="26" fill="rgba(255,255,255,.6)" stroke="'+L+'" stroke-width="4"/>'+sp('translate(112,48)',.12,{body:L,accent:'#FF6FAE',jumper:true})+'</svg>';
     return '';
   }
