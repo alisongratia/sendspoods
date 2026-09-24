@@ -173,6 +173,7 @@ section{padding-block:64px 8px}
 .card h4{margin:0;font-family:var(--hand);font-size:26px;line-height:1;font-weight:700}
 .card .sp{font-size:14px;color:var(--ink-soft);line-height:1.3}
 .card .row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px}
+.card .row .boop{margin-left:auto}
 .boop{border:2px solid var(--line);background:var(--ground-2);border-radius:999px;padding:3px 12px;cursor:pointer;font-weight:800;font-variant-numeric:tabular-nums;font-size:14px}
 .boop:hover{background:var(--pink);color:#2A1636}
 .card.booped .pic svg{animation:boing .5s}
@@ -504,8 +505,8 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       (s.fresh?'<span class="new-sticker">fresh!</span>':'<span class="tape" aria-hidden="true"></span>')+
       '<div class="pic">'+pic+'</div>'+
       '<h4>'+esc(s.name)+'</h4>'+
-      '<p class="sp">'+esc(s.sp)+(sciFor(s.sp)?' <i class="sci">'+sciFor(s.sp)+'</i>':'')+' · found '+esc(s.where)+'</p>'+
-      '<div class="row">'+vibeTags(s.vibes)+'<button class="boop" type="button" aria-label="Boop '+esc(s.name)+'">boop · <span>'+s.boops.toLocaleString()+'</span></button></div>'+
+      '<p class="sp">'+esc(s.sp)+' · found '+esc(s.where)+'</p>'+
+      '<div class="row">'+'<button class="boop" type="button" aria-label="Boop '+esc(s.name)+'">boop · <span>'+s.boops.toLocaleString()+'</span></button></div>'+
     '</article>';
   }
   function render(){
@@ -596,7 +597,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     if(champ.img){var im=new Image();im.src=champ.img;im.alt='Photo of '+champ.name;sotdArt.appendChild(im);}
     else sotdArt.insertAdjacentHTML('beforeend',spoodSVG({body:pal.body,accent:pal.accent,fuzz:champ.fuzz,jumper:champ.jumper,thread:true}));
     document.getElementById('sotdName').innerHTML=champ.title||esc(champ.name);
-    document.getElementById('sotdLatin').innerHTML=champ.latin||(esc(champ.sp)+(sciFor(champ.sp)?' · <i>'+sciFor(champ.sp)+'</i>':''));
+    document.getElementById('sotdLatin').innerHTML=champ.latin||esc(champ.sp);
     document.getElementById('sotdQuote').textContent='“'+(champ.quote||('Found '+champ.where+'.'))+'”';
     var facts=(champ.facts||[['Found',esc(champ.where)]]).concat([['Boops',champ.boops.toLocaleString()]]);
     document.getElementById('sotdFacts').innerHTML=facts.map(function(f){return '<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>';}).join('');
@@ -716,7 +717,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     speciesOther.value='';
     speciesOtherWrap.hidden=!k&&!other;
     var opts=k?k.list.map(function(n){return {name:n[0],sci:n[1]||''};}):other?ALL:[];
-    speciesList.innerHTML=opts.map(function(x){return '<option value="'+x.name+'" label="'+x.sci+'"></option>';}).join('');
+    speciesList.innerHTML=opts.map(function(x){return '<option value="'+x.name+'"></option>';}).join('');
     document.getElementById('speciesOtherLabel').textContent=other?'What kind of spider is it?':'Which one? (optional)';
     speciesOther.placeholder=other?'start typing, e.g. garden':k?'e.g. '+k.list[0][0]+' (or leave blank)':'';
   });
