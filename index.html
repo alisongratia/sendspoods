@@ -738,7 +738,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   var otherOpt=document.createElement('option');otherOpt.value='other';otherOpt.textContent='Type it in myself';speciesSel.appendChild(otherOpt);
   var HINTS={'Orb weaver':'Orb weaver (garden spiders, big round webs)'};
   SPECIES.forEach(function(k,i){var o=document.createElement('option');o.value=String(i);o.textContent=HINTS[k.kind]||k.kind;speciesSel.appendChild(o);});
-  var ALL=[];SPECIES.forEach(function(k){k.list.forEach(function(n){ALL.push({name:n[0],sci:n[1]||'',f:k.f});});});
+  var ALL=[];SPECIES.forEach(function(k){k.list.forEach(function(n){ALL.push({name:n[0],sci:n[1]||'',f:k.f,kind:k.kind});});});
   function chosenKind(){return /^\d+$/.test(speciesSel.value)?SPECIES[+speciesSel.value]:null;}
   speciesSel.addEventListener('change',function(){
     var k=chosenKind(), other=speciesSel.value==='other';
@@ -749,14 +749,18 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     document.getElementById('speciesOtherLabel').textContent=other?'What kind of spider is it?':'Which one? (optional)';
     speciesOther.placeholder=other?'start typing, e.g. garden':k?'e.g. '+k.list[0][0]+' (or leave blank)':'';
   });
+  // Tarantula species are usually named like "Chilean rose", so say it's a tarantula on the card.
+  function withKind(name,kind){
+    return kind==='Tarantula'&&!/tarantula/i.test(name)?name+' tarantula':name;
+  }
   function chosenSpecies(){
     var typed=speciesOther.value.trim().slice(0,80), k=chosenKind();
     if(speciesSel.value==='other'){
       var known=ALL.filter(function(x){return x.name.toLowerCase()===typed.toLowerCase();})[0];
-      return known?{name:known.name,f:known.f}:{name:typed||'Mystery spood',f:'all'};
+      return known?{name:withKind(known.name,known.kind),f:known.f}:{name:typed||'Mystery spood',f:'all'};
     }
     if(!k) return {name:'Mystery spood',f:'all'};
-    return {name:typed||k.kind,f:k.f};
+    return {name:typed?withKind(typed,k.kind):k.kind,f:k.f};
   }
   var sendBtn=document.getElementById('sendBtn');
   document.getElementById('sendForm').addEventListener('submit',function(e){
