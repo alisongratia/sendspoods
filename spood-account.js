@@ -128,10 +128,16 @@
         });
       });
 
+      // Tidy the name as it's typed: lowercase, spaces become _, anything else not allowed is dropped.
+      var handleIn = document.getElementById('acctHandle');
+      handleIn.addEventListener('input', function(){
+        var v = handleIn.value.replace(/^@/, '').toLowerCase().replace(/[\s.\-]+/g, '_').replace(/[^a-z0-9_]/g, '').slice(0, 24);
+        if (v !== handleIn.value) handleIn.value = v;
+      });
       dlg.querySelector('[data-form="name"]').addEventListener('submit', function(e){
         e.preventDefault();
         var h = cleanHandle(document.getElementById('acctHandle').value);
-        if (!h) { status('name', 'Use 2 to 24 letters, numbers or _.'); return; }
+        if (!h) { status('name', 'Names need at least 2 letters or numbers (you can use _ too).'); return; }
         status('name', 'Claiming @' + h + '…');
         sb.from('spood_profiles').insert({ id: state.user.id, handle: h }).then(function(r){
           if (r.error) {
