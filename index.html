@@ -221,6 +221,7 @@ form input[type=text],form select{border:2px solid #2A1636;border-radius:12px;pa
 .vibes input:checked + span{background:#2A1636;color:#FFE872}
 .vibes input:focus-visible + span{outline:3px dashed #2A1636;outline-offset:2px}
 .filepick{border:2px dashed #2A1636;border-radius:12px;padding:12px;text-align:center;cursor:pointer;font-family:var(--hand);font-size:20px;background:#FFF4B8;color:#2A1636}
+.filepick img{display:block;max-height:200px;max-width:100%;margin:0 auto 8px;border-radius:10px;border:2px solid #2A1636}
 .filepick input{position:absolute;opacity:0;width:1px;height:1px}
 form .btn{justify-self:start;background:#2A1636;color:#FFE872;border-color:#2A1636;box-shadow:4px 4px 0 #FF6FAE}
 
@@ -282,7 +283,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       <svg class="dz-spood" viewBox="0 0 54 150" aria-hidden="true"></svg>
       <div class="dz-inner">
         <strong>Drop a spood photo here</strong>
-        <span>or tap to choose · or paste with Ctrl/⌘+V</span>
+        <span>then give it a name and it joins the gallery</span>
       </div>
       <input type="file" id="dzFile" accept="image/*" multiple>
       <input type="file" id="slotFile" accept="image/*" hidden>
@@ -363,7 +364,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         </ul>
       </div>
       <form id="sendForm" novalidate>
-        <label class="filepick" for="formFile"><span id="fileLabel">Tap to pick a spood photo</span>
+        <label class="filepick" for="formFile"><img id="filePreview" alt="Your spood photo" hidden><span id="fileLabel">Tap to pick a spood photo</span>
           <input type="file" id="formFile" accept="image/*">
         </label>
         <div class="two">
@@ -648,12 +649,9 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     return spoods[0];
   }
   function addPhotos(items){
-    // items: [{file, meta}] — fills empty featured slots first unless meta is given
+    // items: [{file, meta}] — every photo becomes its own new card
     return Promise.all(items.map(function(it){
-      var rec;
-      var open=it.meta?null:spoods.filter(function(x){return x.slot&&!x.img&&!x.claimed;})[0];
-      if(open){open.claimed=true;rec={id:'slot-'+open.slot,slot:open.slot};}
-      else rec=Object.assign({id:newId(),name:funNames[Math.floor(Math.random()*funNames.length)],sp:'Mystery spood',where:'somewhere glorious',f:'all',p:Math.floor(Math.random()*6)},it.meta||{});
+      var rec=Object.assign({id:newId(),name:funNames[Math.floor(Math.random()*funNames.length)],sp:'Mystery spood',where:'somewhere glorious',f:'all',p:Math.floor(Math.random()*6)},it.meta||{});
       return readFile(it.file).then(function(src){
         var sp=applyRecord(rec,src); if(sp) sp.fresh=true;
         return persist(it.file,rec).then(function(saved){return {sp:sp,saved:saved};});
@@ -671,11 +669,11 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   function takeFiles(files){
     var imgs=[].filter.call(files,function(f){return f.type.indexOf('image/')===0;});
     if(!imgs.length){say('Save the photo to your device first, then tap “Choose spood photos”.');return;}
-    say('Adding your spood'+(imgs.length>1?'s':'')+'…');
-    addPhotos(imgs.map(function(f){return {file:f};})).then(function(res){
-      afterAdd(res,res.length===1?'is in the gallery':'are in the gallery');
-      document.getElementById('gallery').scrollIntoView({behavior:'smooth'});
-    });
+    // A dropped photo goes into the send form so it can be named before joining the gallery
+    setPending(imgs[0]);
+    document.getElementById('send').scrollIntoView({behavior:'smooth'});
+    try{document.getElementById('spoodName').focus({preventScroll:true});}catch(e){}
+    say(imgs.length>1?'One spood at a time — we loaded the first photo. Give it a name!':'Great spood! Now give it a name and hit Send.');
   }
   var dz=document.getElementById('dz'), dzFile=document.getElementById('dzFile');
   dzFile.addEventListener('change',function(){takeFiles(dzFile.files);dzFile.value='';});
@@ -688,11 +686,18 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   });
 
   // ---------- form ----------
-  var formFile=document.getElementById('formFile'), fileLabel=document.getElementById('fileLabel');
-  formFile.addEventListener('change',function(){fileLabel.textContent=formFile.files[0]?'Got it: '+formFile.files[0].name:'Tap to pick a spood photo';});
+  var formFile=document.getElementById('formFile'), fileLabel=document.getElementById('fileLabel'), filePreview=document.getElementById('filePreview');
+  var pendingFile=null;
+  function setPending(f){
+    pendingFile=f||null;
+    if(!pendingFile){filePreview.hidden=true;filePreview.removeAttribute('src');fileLabel.textContent='Tap to pick a spood photo';return;}
+    readFile(pendingFile).then(function(src){filePreview.src=src;filePreview.hidden=false;});
+    fileLabel.textContent='Looking good! Tap to pick a different photo';
+  }
+  formFile.addEventListener('change',function(){setPending(formFile.files[0]);});
   document.getElementById('sendForm').addEventListener('submit',function(e){
     e.preventDefault();
-    var f=formFile.files[0];
+    var f=pendingFile;
     if(!f){say('Pick a photo first — the spood wants to be seen.');return;}
     var sel=document.getElementById('species'), opt=sel.options[sel.selectedIndex];
     var name=document.getElementById('spoodName').value.trim();
@@ -702,7 +707,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       where:document.getElementById('where').value.trim()||'somewhere glorious',
       f:opt.dataset.f||'all'
     }}]).then(function(res){
-      e.target.reset(); fileLabel.textContent='Tap to pick a spood photo';
+      e.target.reset(); setPending(null);
       afterAdd(res,'is in the gallery');
       document.getElementById('gallery').scrollIntoView({behavior:'smooth'});
     });
