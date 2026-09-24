@@ -689,19 +689,25 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   var speciesSel=document.getElementById('species'), speciesOtherWrap=document.getElementById('speciesOtherWrap');
   var speciesOther=document.getElementById('speciesOther'), speciesList=document.getElementById('speciesList');
   var otherOpt=document.createElement('option');otherOpt.value='other';otherOpt.textContent='Type it in myself';speciesSel.appendChild(otherOpt);
-  SPECIES.forEach(function(k,i){var o=document.createElement('option');o.value=String(i);o.textContent=k.kind;speciesSel.appendChild(o);});
+  var HINTS={'Orb weaver':'Orb weaver (garden spiders, big round webs)'};
+  SPECIES.forEach(function(k,i){var o=document.createElement('option');o.value=String(i);o.textContent=HINTS[k.kind]||k.kind;speciesSel.appendChild(o);});
+  var ALL=[];SPECIES.forEach(function(k){k.list.forEach(function(n){ALL.push({name:n,f:k.f});});});
   function chosenKind(){return /^\d+$/.test(speciesSel.value)?SPECIES[+speciesSel.value]:null;}
   speciesSel.addEventListener('change',function(){
     var k=chosenKind(), other=speciesSel.value==='other';
     speciesOther.value='';
     speciesOtherWrap.hidden=!k&&!other;
-    speciesList.innerHTML=k?k.list.map(function(n){return '<option value="'+n+'"></option>';}).join(''):'';
+    var names=k?k.list:other?ALL.map(function(x){return x.name;}):[];
+    speciesList.innerHTML=names.map(function(n){return '<option value="'+n+'"></option>';}).join('');
     document.getElementById('speciesOtherLabel').textContent=other?'What kind of spider is it?':'Which one? (optional)';
-    speciesOther.placeholder=other?'e.g. Bolas spider':k?'e.g. '+k.list[0]+' (or leave blank)':'';
+    speciesOther.placeholder=other?'start typing, e.g. garden':k?'e.g. '+k.list[0]+' (or leave blank)':'';
   });
   function chosenSpecies(){
     var typed=speciesOther.value.trim().slice(0,80), k=chosenKind();
-    if(speciesSel.value==='other') return {name:typed||'Mystery spood',f:'all'};
+    if(speciesSel.value==='other'){
+      var known=ALL.filter(function(x){return x.name.toLowerCase()===typed.toLowerCase();})[0];
+      return known?{name:known.name,f:known.f}:{name:typed||'Mystery spood',f:'all'};
+    }
     if(!k) return {name:'Mystery spood',f:'all'};
     return {name:typed||k.kind,f:k.f};
   }
