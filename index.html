@@ -164,6 +164,7 @@ section{padding-block:64px 8px}
 .card .pic{position:relative}
 .swap{position:absolute;top:8px;right:8px;border:2px solid #2A1636;background:#FFFDF3;color:#2A1636;border-radius:999px;font-size:13px;font-weight:800;padding:2px 10px;cursor:pointer}
 .swap:hover{background:#FFE872}
+.example-note{font-family:var(--hand);font-size:20px;color:var(--ink-soft);margin:0 0 14px}
 .slot-note{position:absolute;bottom:8px;left:8px;right:8px;text-align:center;background:rgba(255,253,243,.9);color:#2A1636;border-radius:999px;font-family:var(--hand);font-size:16px;font-weight:700;padding:2px 8px}
 .card .tape{position:absolute;top:-12px;left:50%;width:74px;height:22px;margin-left:-37px;background:var(--pink);opacity:.8;transform:rotate(-4deg);border-radius:2px}
 .card h4{margin:0;font-family:var(--hand);font-size:26px;line-height:1;font-weight:700}
@@ -286,7 +287,6 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         <span>then give it a name and it joins the gallery</span>
       </div>
       <input type="file" id="dzFile" accept="image/*" multiple>
-      <input type="file" id="slotFile" accept="image/*" hidden>
     </label>
   </header>
 
@@ -329,13 +329,14 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         <button class="chip" aria-pressed="false" data-f="tiny">Tiny lads</button>
       </div>
     </div>
+    <p class="example-note" id="exampleNote">These are example spoods. Send yours in to be one of the first real ones!</p>
     <div class="grid" id="grid"></div>
   </section>
 
   <section id="hall">
     <div class="shead">
       <h2>Hall of Legs</h2>
-      <p>this month’s decorated spoods</p>
+      <p id="hallSub">this month’s decorated spoods</p>
     </div>
     <div class="hall" id="hallGrid"></div>
   </section>
@@ -389,8 +390,8 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
           <label><input type="checkbox" id="v4" name="vibe" value="menacing (lovingly)"><span>menacing (lovingly)</span></label>
           <label><input type="checkbox" id="v5" name="vibe" value="derpy"><span>derpy</span></label>
         </fieldset>
-        <button class="btn" type="submit">Send this spood</button>
-        <p style="font-size:14px;color:#5B4768;margin:0">Preview: your spood shows up in the gallery on your screen, but isn’t saved or sent anywhere yet.</p>
+        <button class="btn" type="submit" id="sendBtn">Send this spood</button>
+        <p style="font-size:14px;color:#5B4768;margin:0">Every spood is checked by a human before it shows up in the gallery.</p>
       </form>
     </div>
   </section>
@@ -406,11 +407,12 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
 
   <footer>
     <span>sendspoods.com · made with love and approximately 8 legs</span>
-    <span>preview site · shop and submissions coming soon</span>
+    <span>shop coming soon</span>
   </footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   // ---------- spood drawing ----------
@@ -514,7 +516,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   function cardHTML(s,i){
     var pal=palettes[s.p%palettes.length];
     var pic=s.img?'<img src="'+s.img+'" alt="Photo of '+esc(s.name)+'">':spoodSVG({body:pal.body,accent:pal.accent,fuzz:s.fuzz,jumper:s.jumper});
-    return '<article class="card" data-f="'+s.f+'" style="--tilt:'+tilts[i%tilts.length]+';--bg:'+pal.bg+'">'+
+    return '<article class="card" data-i="'+i+'" data-f="'+s.f+'" style="--tilt:'+tilts[i%tilts.length]+';--bg:'+pal.bg+'">'+
       (s.fresh?'<span class="new-sticker">fresh!</span>':'<span class="tape" aria-hidden="true"></span>')+
       '<div class="pic">'+pic+'</div>'+
       '<h4>'+esc(s.name)+'</h4>'+
@@ -538,37 +540,72 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     });
   });
 
-  var totalBoops=318770;
-  var stB=document.getElementById('stBoops');
-  stB.textContent=totalBoops.toLocaleString();
-  var slotFile=document.getElementById('slotFile'), slotTarget=null;
-  grid.addEventListener('click',function(e){
-    var sw=e.target.closest('.swap');
-    if(sw){slotTarget=sw.dataset.slot;slotFile.click();return;}
-  });
-  slotFile.addEventListener('change',function(){
-    var f=slotFile.files[0]; slotFile.value='';
-    if(!f||!slotTarget) return;
-    var rec={id:'slot-'+slotTarget,slot:slotTarget};
-    readFile(f).then(function(src){
-      var sp=applyRecord(rec,src); sp.fresh=true; render();
-      return persist(f,rec).then(function(saved){say(sp.name+' has a new photo'+(saved?' — saved for good.':' — showing in this browser only.'));});
-    });
-  });
+  // ---------- live data (Supabase: the "spoods" bucket and spood_ tables) ----------
+  var SB_URL='https://uupdhdyxlppntfxmmwct.supabase.co';
+  var SB_KEY='sb_publishable_L25cBrz92G46Q8r9SiUlsg_l8xJ4CyB';
+  var sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_KEY):null;
+  var live=false, sotdId=null;
+  var EXAMPLE_STATS={spoods:12408,boops:318770};
+  function totalBoops(){return spoods.reduce(function(t,x){return t+x.boops;},0);}
+  function updateStats(){
+    var n=live?spoods.length:EXAMPLE_STATS.spoods, b=live?totalBoops():EXAMPLE_STATS.boops;
+    document.getElementById('stSpoods').textContent=n.toLocaleString();
+    document.getElementById('stLegs').textContent=(n*8).toLocaleString();
+    document.getElementById('stBoops').textContent=b.toLocaleString();
+  }
+  function paletteFor(id){var h=0;for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))|0;return Math.abs(h)%palettes.length;}
+
+  function loadLive(){
+    if(!sb) return;
+    sb.from('spood_submissions')
+      .select('id,name,species,where_found,filter_tags,photo_path,boops,featured_story,created_at')
+      .order('created_at',{ascending:false}).limit(200)
+      .then(function(res){
+        if(res.error){console.warn('spoods',res.error);return;}
+        if(!res.data.length) return; // nothing approved yet: keep the examples
+        var rows=res.data;
+        return sb.storage.from('spoods').createSignedUrls(rows.map(function(x){return x.photo_path;}),60*60*24).then(function(u){
+          var urls={};
+          (u.data||[]).forEach(function(x){if(x.signedUrl) urls[x.path]=x.signedUrl;});
+          var twoDays=2*24*60*60*1000;
+          spoods=rows.map(function(x){return {
+            id:x.id,name:x.name,sp:x.species,where:x.where_found,f:x.filter_tags||'all',legs:8,boops:x.boops,
+            p:paletteFor(x.id),img:urls[x.photo_path],quote:x.featured_story,
+            fresh:Date.now()-new Date(x.created_at).getTime()<twoDays
+          };});
+          live=true;
+          return sb.rpc('spood_of_the_day');
+        }).then(function(d){
+          if(d&&!d.error) sotdId=d.data;
+          document.getElementById('exampleNote').hidden=true;
+          document.getElementById('hallSub').textContent='the most-booped spoods right now';
+          render(); renderSotd(); renderHall(); updateStats();
+        });
+      });
+  }
+
   grid.addEventListener('click',function(e){
     var b=e.target.closest('.boop'); if(!b) return;
-    var card=b.closest('.card'), idx=[].indexOf.call(grid.children,card);
-    spoods[idx].boops++; b.querySelector('span').textContent=spoods[idx].boops.toLocaleString();
-    totalBoops++; stB.textContent=totalBoops.toLocaleString();
+    var card=b.closest('.card'), s=spoods[+card.dataset.i], span=b.querySelector('span');
+    s.boops++; span.textContent=s.boops.toLocaleString();
+    if(!live) EXAMPLE_STATS.boops++;
+    updateStats();
     card.classList.remove('booped'); void card.offsetWidth; card.classList.add('booped');
+    if(live&&s.id){
+      var hoped=s.boops;
+      sb.rpc('spood_boop',{p_id:s.id}).then(function(r){
+        if(r.error||typeof r.data!=='number') return;
+        s.boops=r.data; span.textContent=s.boops.toLocaleString(); updateStats();
+        if(r.data<hoped) say(s.name+' is feeling very booped today. Come back tomorrow!');
+      });
+    }
   });
 
   // ---------- spood of the day + hall ----------
-  // Spood of the Day: whichever spood has the most boops. Picked once when the page loads,
-  // so booping during a visit doesn't swap the champion mid-scroll.
+  // Live: most boops in the last day (decided by the database). Examples: most boops overall.
   var sotdArt=document.getElementById('sotdArt');
   function renderSotd(){
-    var champ=spoods.reduce(function(a,b){return b.boops>a.boops?b:a;});
+    var champ=(sotdId&&spoods.filter(function(x){return x.id===sotdId;})[0])||spoods.reduce(function(a,b){return b.boops>a.boops?b:a;});
     var pal=palettes[champ.p%palettes.length];
     sotdArt.style.background=pal.bg;
     var old=sotdArt.querySelector('svg,img'); if(old) old.remove();
@@ -576,12 +613,13 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     else sotdArt.insertAdjacentHTML('beforeend',spoodSVG({body:pal.body,accent:pal.accent,fuzz:champ.fuzz,jumper:champ.jumper,thread:true}));
     document.getElementById('sotdName').innerHTML=champ.title||esc(champ.name);
     document.getElementById('sotdLatin').innerHTML=champ.latin||esc(champ.sp);
-    document.getElementById('sotdQuote').textContent='“'+(champ.quote||('Found '+champ.where+'. Booped more than any other spood today.'))+'”';
-    var facts=(champ.facts||[['Legs visible',champ.legs+' of 8']]).concat([['Boops',champ.boops.toLocaleString()]]);
+    document.getElementById('sotdQuote').textContent='“'+(champ.quote||('Found '+champ.where+'.'))+'”';
+    var facts=(champ.facts||[['Found',esc(champ.where)]]).concat([['Boops',champ.boops.toLocaleString()]]);
     document.getElementById('sotdFacts').innerHTML=facts.map(function(f){return '<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>';}).join('');
-    document.getElementById('sotdNote').textContent='Most-booped spood in the gallery · boop your favorite to help them take the crown';
+    document.getElementById('sotdNote').textContent=live
+      ?'Most boops in the last day wins the crown · boop your favorite!'
+      :'Example spood · send yours in and boop it to the top';
   }
-  function setSotd(){}
 
   // ---------- shop ----------
   var products=[
@@ -618,62 +656,42 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     {t:'Best Web',n:'Lady Charlotte',w:'rebuilt it 31 times',p:1,jumper:false},
     {t:'Most Legs Visible',n:'Gerald',w:'a perfect 8/8',p:0,jumper:true}
   ];
-  document.getElementById('hallGrid').innerHTML=awards.map(function(a){
-    var pal=palettes[a.p];
-    return '<div class="award"><div class="medal" style="--bg:'+pal.bg+'">'+spoodSVG({body:pal.body,accent:pal.accent,fuzz:a.fuzz,jumper:a.jumper})+'</div><div><small>'+a.t+'</small><b>'+a.n+'</b><span>'+a.w+'</span></div></div>';
-  }).join('');
+  function renderHall(){
+    var list=live
+      ?spoods.slice().sort(function(a,b){return b.boops-a.boops;}).slice(0,4).map(function(s,i){
+          return {t:'#'+(i+1)+' most booped',n:esc(s.name),w:s.boops.toLocaleString()+' boops',p:s.p,img:s.img,jumper:true};})
+      :awards;
+    document.getElementById('hallGrid').innerHTML=list.map(function(a){
+      var pal=palettes[a.p%palettes.length];
+      var art=a.img?'<img src="'+a.img+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':spoodSVG({body:pal.body,accent:pal.accent,fuzz:a.fuzz,jumper:a.jumper});
+      return '<div class="award"><div class="medal" style="--bg:'+pal.bg+';overflow:hidden">'+art+'</div><div><small>'+a.t+'</small><b>'+a.n+'</b><span>'+a.w+'</span></div></div>';
+    }).join('');
+  }
 
   // ---------- uploads ----------
-  var spoodCount=12408;
   var funNames=['Kevin','Mothra Jr.','Sprinkles','Baron von Legs','Pickles','Tofu','Sir Scuttles','Meatball','Duchess','Tater'];
   var toast=document.getElementById('toast'), tt;
-  function say(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},2800);}
-  function bumpStats(){
-    spoodCount++;
-    document.getElementById('stSpoods').textContent=spoodCount.toLocaleString();
-    document.getElementById('stLegs').textContent=(spoodCount*8).toLocaleString();
-  }
-  // Saved photos: uploaded to the page's asset store, indexed in the "uploads" collection.
-  var store={db:null,assets:null};
-  function newId(){return 'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+  function say(msg,ms){toast.textContent=msg;toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},ms||2800);}
   function readFile(file){return new Promise(function(res){var r=new FileReader();r.onload=function(){res(r.result);};r.readAsDataURL(file);});}
-  function persist(file,rec){
-    if(!store.db||!store.assets) return Promise.resolve(false);
-    return store.assets.upload(file).then(function(a){
-      return store.db.collection('uploads').doc(rec.id).set(Object.assign({},rec,{asset:a.id,at:Date.now()}));
-    }).then(function(){return true;},function(e){console.warn('save failed',e);return false;});
+  // Shrink to at most 1600px and re-encode as JPEG (smaller uploads, and phone formats become JPEG).
+  function toJpeg(file){
+    return new Promise(function(res){
+      var url=URL.createObjectURL(file), im=new Image();
+      im.onload=function(){
+        var sc=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight));
+        var c=document.createElement('canvas');
+        c.width=Math.round(im.naturalWidth*sc); c.height=Math.round(im.naturalHeight*sc);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function(b){res(b);},'image/jpeg',0.85);
+      };
+      im.onerror=function(){URL.revokeObjectURL(url);res(null);};
+      im.src=url;
+    });
   }
-  function applyRecord(rec,src){
-    if(rec.slot){
-      var slot=spoods.filter(function(x){return x.slot===rec.slot;})[0];
-      if(!slot) return null;
-      slot.img=src; slot.uid=rec.id;
-      if(rec.slot==='mama') setSotd(src);
-      return slot;
-    }
-    var have=spoods.filter(function(x){return x.uid===rec.id;})[0];
-    if(have) return have;
-    spoods.unshift({uid:rec.id,name:rec.name,sp:rec.sp||'Mystery spood',where:rec.where||'somewhere glorious',f:rec.f||'all',legs:8,boops:rec.boops||0,p:rec.p||0,img:src,fresh:true});
-    bumpStats();
-    return spoods[0];
-  }
-  function addPhotos(items){
-    // items: [{file, meta}] — every photo becomes its own new card
-    return Promise.all(items.map(function(it){
-      var rec=Object.assign({id:newId(),name:funNames[Math.floor(Math.random()*funNames.length)],sp:'Mystery spood',where:'somewhere glorious',f:'all',p:Math.floor(Math.random()*6)},it.meta||{});
-      return readFile(it.file).then(function(src){
-        var sp=applyRecord(rec,src); if(sp) sp.fresh=true;
-        return persist(it.file,rec).then(function(saved){return {sp:sp,saved:saved};});
-      });
-    }));
-  }
-  function afterAdd(results,verb){
-    currentFilter='all';
-    document.querySelectorAll('.chip').forEach(function(x){x.setAttribute('aria-pressed',x.dataset.f==='all'?'true':'false');});
-    render();
-    var saved=results.every(function(x){return x.saved;});
-    var who=results.length===1?results[0].sp.name+' '+verb:results.length+' spoods '+verb;
-    say(who+(saved?' — saved for good.':' — showing in this browser only.'));
+  function uuid(){
+    if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return (c==='x'?r:(r&3|8)).toString(16);});
   }
   function takeFiles(files){
     var imgs=[].filter.call(files,function(f){return f.type.indexOf('image/')===0;});
@@ -704,26 +722,43 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     fileLabel.textContent='Looking good! Tap to pick a different photo';
   }
   formFile.addEventListener('change',function(){setPending(formFile.files[0]);});
+  var sendBtn=document.getElementById('sendBtn');
   document.getElementById('sendForm').addEventListener('submit',function(e){
     e.preventDefault();
-    var f=pendingFile;
+    var form=e.target, f=pendingFile;
     if(!f){say('Pick a photo first — the spood wants to be seen.');return;}
+    if(!sb){say('We couldn’t reach spood HQ. Check your connection and try again.');return;}
     var sel=document.getElementById('species'), opt=sel.options[sel.selectedIndex];
-    var name=document.getElementById('spoodName').value.trim();
-    addPhotos([{file:f,meta:{
-      name:name||funNames[Math.floor(Math.random()*funNames.length)],
-      sp:sel.value,
-      where:document.getElementById('where').value.trim()||'somewhere glorious',
-      f:opt.dataset.f||'all'
-    }}]).then(function(res){
-      e.target.reset(); setPending(null);
-      afterAdd(res,'is in the gallery');
-      document.getElementById('gallery').scrollIntoView({behavior:'smooth'});
+    var name=document.getElementById('spoodName').value.trim()||funNames[Math.floor(Math.random()*funNames.length)];
+    var vibes=[].map.call(form.querySelectorAll('input[name=vibe]:checked'),function(x){return x.value;});
+    sendBtn.disabled=true; sendBtn.textContent='Sending…';
+    function done(){sendBtn.disabled=false;sendBtn.textContent='Send this spood';}
+    toJpeg(f).then(function(blob){
+      if(!blob) throw {friendly:'We couldn’t read that photo. Try a JPG or PNG.'};
+      var path='uploads/'+uuid()+'.jpg';
+      return sb.storage.from('spoods').upload(path,blob,{contentType:'image/jpeg',upsert:false}).then(function(up){
+        if(up.error) throw up.error;
+        return sb.from('spood_submissions').insert({
+          name:name.slice(0,60),
+          species:sel.value,
+          where_found:(document.getElementById('where').value.trim()||'somewhere glorious').slice(0,140),
+          filter_tags:opt.dataset.f||'all',
+          vibes:vibes,
+          photo_path:path
+        });
+      }).then(function(ins){if(ins.error) throw ins.error;});
+    }).then(function(){
+      form.reset(); setPending(null); done();
+      say('Thanks! '+name+' is waiting for approval and will join the gallery once it’s checked.',6000);
+    }).catch(function(err){
+      console.warn('send failed',err); done();
+      say(err&&err.friendly||'That spood didn’t send. Please try again in a moment.',5000);
     });
   });
 
   // ---------- boot ----------
-  render(); renderSotd(); paintDecor(); drawWeb();
+  render(); renderSotd(); renderHall(); updateStats(); paintDecor(); drawWeb();
+  loadLive();
   window.addEventListener('resize',drawWeb);
   try{
     new MutationObserver(function(){paintDecor();drawWeb();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});

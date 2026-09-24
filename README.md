@@ -2,12 +2,33 @@
 
 A fun, whimsical place for people to share photos of their glorious spiders ("spoods"). This is the preview version of **sendspoods.com**: a single page (`index.html`) with no build step.
 
-## What works right now
+## How it works
 
-- Gallery with filters and "boop" buttons
-- Spood of the Day and Hall of Legs
-- Merch shop preview (the cart only counts items and doesn't take payment)
-- Adding a photo shows it in the gallery **on your own screen only**. Nothing is saved or sent anywhere yet.
+The page is a single file, `index.html`, with no build step. Submissions, photos and boops are stored in the **Urban Exposed** Supabase project, kept separate from Urban Exposed's own data:
+
+- Photos go in the private **`spoods`** storage bucket (Urban Exposed uses `locations` and `Favorites for Showcase`).
+- Submissions live in the **`spood_submissions`** table, and boops in **`spood_boops`**.
+- The public can only submit spoods, see approved spoods and their photos, and boop them. The rules are in `supabase/migrations/`.
+
+Until at least one spood is approved, the gallery shows the cartoon example spoods.
+
+## Approving spoods
+
+New submissions are hidden until you approve them.
+
+1. Open the [Supabase dashboard](https://supabase.com/dashboard) → the **Urban Exposed** project → **Table Editor** → **spood_submissions**.
+2. To see the photo, go to **Storage** → **spoods** → **uploads** and open the file named in the row's `photo_path`.
+3. Change the row's `status` from `pending` to `approved` (or `rejected`) and save. It appears on the site on the next page load.
+4. Optional: fill in `featured_story` with a fun line. It's shown if that spood becomes Spood of the Day.
+
+## Boops and Spood of the Day
+
+- Each boop is saved. One visitor can give a spood at most 30 boops a day.
+- Spood of the Day is the approved spood with the most boops in the last 24 hours (ties go to the most boops overall).
+
+## Shop
+
+The shop is still a preview: the cart only counts items and doesn't take payment.
 
 ## Putting it live (one-time setup)
 
@@ -29,5 +50,4 @@ After buying `sendspoods.com` from a domain seller:
 
 ## Later
 
-- Saving submitted photos (and approving them before they appear) needs a storage service such as Supabase.
 - The shop can link to a print-on-demand service such as Printful or Shopify for real orders.
