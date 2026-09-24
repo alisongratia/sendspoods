@@ -618,12 +618,18 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
 
   // ---------- shop ----------
   var products=[
-    {n:'Spood Crew Tee',d:'Heavyweight cotton. Front: Peaches, back: "8 legs, 0 problems."',pr:28,bg:'#9BE3B9',tag:'fan fave',k:'tee'},
-    {n:'Mama Legs Mug',d:'Holds 12 oz of coffee and roughly forty spiderlings’ worth of love.',pr:18,bg:'#FFD66B',k:'mug'},
-    {n:'I Brake for Spoods',d:'Weatherproof bumper sticker, 10 × 3 in. Tell the world.',pr:5,bg:'#FF9FCB',k:'sticker'},
-    {n:'Queen Stripes Pin',d:'Hard enamel pin with a gold zigzag, just like her web.',pr:12,bg:'#7CCBFF',tag:'new',k:'pin'},
-    {n:'Peaches Plush',d:'Eight wiggly legs, two enormous eyes, fully huggable.',pr:24,bg:'#C9B6FF',tag:'so soft',k:'plush'},
-    {n:'Catch & Release Kit',d:'A clear cup, a stiff card, and a tiny certificate of rescue.',pr:9,bg:'#FFB38A',k:'kit'}
+    {n:'Mama Legs Mug',d:'Holds 12 oz of coffee and roughly forty spiderlings’ worth of love.',bg:'#FFD66B',tag:'first up',k:'mug'},
+    {n:'Spood Crew Tee',d:'Heavyweight cotton. Front: Peaches, back: "8 legs, 0 problems."',bg:'#9BE3B9',tag:'fan fave',k:'tee'},
+    {n:'Spood Shuttle Glass',d:'A clear glass for your drinks, or for gently relocating a spood. “Place spood here” circle included.',bg:'#7CCBFF',tag:'new',k:'glass'},
+    {n:'Spood Spotter’s Field Journal',d:'Log every spood you meet: name, species, where found, vibe, and legs visible out of 8.',bg:'#C9B6FF',tag:'new',k:'journal'},
+    {n:'Certified Spood Relocator',d:'Make it official. A badge for everyone who catches and releases.',bg:'#FFB38A',k:'badge'},
+    {n:'Spood Eviction Notices',d:'Sticky notes for polite relocations: “You are being relocated. Nothing personal. — Management.”',bg:'#FFE872',k:'notes'},
+    {n:'I Brake for Spoods',d:'Weatherproof bumper sticker, 10 × 3 in. Tell the world.',bg:'#FF9FCB',k:'sticker'},
+    {n:'Spider-Friendly Home Decal',d:'A window decal that lets everyone know: this home catches and releases.',bg:'#9BE3B9',k:'decal'},
+    {n:'Queen Stripes Pin',d:'Hard enamel pin with a gold zigzag, just like her web.',bg:'#7CCBFF',k:'pin'},
+    {n:'Spood Rescue Cap',d:'An embroidered crew cap for the spood rescue squad.',bg:'#FFD66B',k:'cap'},
+    {n:'Peaches Plush',d:'Eight wiggly legs, two enormous eyes, fully huggable.',bg:'#C9B6FF',tag:'so soft',k:'plush'},
+    {n:'Spood Catcher',d:'A long-handled catcher for gentle, no-touch relocations. In the works.',bg:'#FF9FCB',tag:'someday',k:'catcher'}
   ];
   function productArt(k){
     var sp=function(t,sc,o){return '<g transform="'+t+' scale('+sc+')">'+spoodSVG(o||{}).replace(/^<svg[^>]*>|<\/svg>$/g,'')+'</g>';};
@@ -633,7 +639,15 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     if(k==='sticker') return '<svg viewBox="0 0 200 160"><rect x="10" y="50" width="180" height="60" rx="10" fill="#FFFDF3" stroke="'+L+'" stroke-width="4" transform="rotate(-4 100 80)"/><text x="100" y="89" text-anchor="middle" font-family="Bagel Fat One,sans-serif" font-size="15" fill="'+L+'" transform="rotate(-4 100 80)">I BRAKE FOR SPOODS</text></svg>';
     if(k==='pin') return '<svg viewBox="0 0 200 160"><circle cx="100" cy="80" r="62" fill="#FFE872" stroke="'+L+'" stroke-width="6"/><path d="M70 40 L90 60 L70 80 L90 100 L70 120 M130 40 L110 60 L130 80 L110 100 L130 120" stroke="#fff" stroke-width="5" fill="none"/>'+sp('translate(64,48)',.36,{body:'#1A0D22',accent:'#FFE872',jumper:false})+'</svg>';
     if(k==='plush') return '<svg viewBox="0 0 200 160">'+sp('translate(10,-20)',.9,{body:'#3B1F12',accent:'#FF9F5A',jumper:true,fuzz:true})+'</svg>';
-    return '<svg viewBox="0 0 200 160"><path d="M50 40 L150 40 L138 140 L62 140Z" fill="rgba(255,255,255,.55)" stroke="'+L+'" stroke-width="4" stroke-linejoin="round"/><rect x="40" y="30" width="120" height="12" rx="4" fill="#FFFDF3" stroke="'+L+'" stroke-width="4"/>'+sp('translate(76,76)',.24,{body:L,accent:'#FF6FAE',jumper:true})+'</svg>';
+    var T=function(x,y,size,txt,fam,rot){return '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-family="'+(fam||'Figtree, sans-serif')+'" font-weight="800" font-size="'+size+'" fill="'+L+'"'+(rot?' transform="rotate('+rot+' '+x+' '+y+')"':'')+'>'+txt+'</text>';};
+    if(k==='glass') return '<svg viewBox="0 0 200 160"><path d="M46 18 L154 18 L144 146 L56 146Z" fill="rgba(255,255,255,.6)" stroke="'+L+'" stroke-width="4" stroke-linejoin="round"/><path d="M58 26 L56 136" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>'+T(100,44,12,'SPOOD','Bagel Fat One, sans-serif')+T(100,56,9,'SHUTTLE')+T(100,67,6,'gentle relocation service')+'<circle cx="100" cy="100" r="24" fill="none" stroke="'+L+'" stroke-width="2" stroke-dasharray="4 4"/>'+sp('translate(88,86)',.12,{body:L,accent:'#FF6FAE',jumper:true})+T(100,136,7,'place spood here')+'</svg>';
+    if(k==='journal') return '<svg viewBox="0 0 200 160"><rect x="52" y="14" width="100" height="134" rx="8" fill="#2A1636"/><rect x="58" y="14" width="94" height="134" rx="6" fill="#FFFDF3" stroke="'+L+'" stroke-width="4"/><rect x="138" y="14" width="6" height="134" fill="#FF6FAE"/>'+T(98,44,12,'SPOOD','Bagel Fat One, sans-serif')+T(98,58,8,'SPOTTER’S')+T(98,70,8,'FIELD JOURNAL')+sp('translate(80,78)',.2,{body:'#4A2A1A',accent:'#FFE872',jumper:false,fuzz:true})+'</svg>';
+    if(k==='badge') return '<svg viewBox="0 0 200 160"><path d="M100 10 L150 28 L146 92 Q140 128 100 150 Q60 128 54 92 L50 28Z" fill="#FFFDF3" stroke="'+L+'" stroke-width="5" stroke-linejoin="round"/>'+T(100,42,9,'CERTIFIED')+sp('translate(82,48)',.18,{body:L,accent:'#FF6FAE',jumper:true})+T(100,104,13,'SPOOD','Bagel Fat One, sans-serif')+T(100,120,9,'RELOCATOR')+'<path d="M84 130 L100 138 L116 130" stroke="#FF6FAE" stroke-width="4" fill="none" stroke-linecap="round"/></svg>';
+    if(k==='notes') return '<svg viewBox="0 0 200 160"><rect x="48" y="24" width="112" height="112" fill="#FFFDF3" stroke="'+L+'" stroke-width="3" transform="rotate(6 104 80)"/><rect x="42" y="18" width="112" height="112" fill="#FFF4B8" stroke="'+L+'" stroke-width="4" transform="rotate(-4 98 74)"/><g transform="rotate(-4 98 74)">'+T(98,46,14,'NOTICE','Bagel Fat One, sans-serif')+T(98,66,8,'You are being')+T(98,78,8,'relocated.')+T(98,94,8,'Nothing personal.')+T(98,114,8,'— Management')+'</g></svg>';
+    if(k==='decal') return '<svg viewBox="0 0 200 160"><rect x="36" y="14" width="128" height="134" rx="4" fill="#DDF3FF" stroke="'+L+'" stroke-width="5"/><path d="M100 14 V148 M36 81 H164" stroke="'+L+'" stroke-width="5"/><circle cx="100" cy="81" r="34" fill="#FFFDF3" stroke="'+L+'" stroke-width="3"/>'+sp('translate(88,58)',.12,{body:L,accent:'#FF6FAE',jumper:true})+T(100,90,7,'SPIDER-FRIENDLY')+T(100,100,7,'HOME')+'</svg>';
+    if(k==='cap') return '<svg viewBox="0 0 200 160"><path d="M40 104 Q42 40 100 38 Q158 40 160 104 Z" fill="#2A1636"/><path d="M40 104 Q100 92 188 112 Q160 124 40 110 Z" fill="#2A1636" stroke="#FFFDF3" stroke-width="2"/><circle cx="100" cy="40" r="5" fill="#FF6FAE"/><rect x="66" y="58" width="68" height="32" rx="8" fill="#FFE872" stroke="#FFFDF3" stroke-width="2" stroke-dasharray="3 2"/>'+T(100,72,9,'SPOOD','Bagel Fat One, sans-serif')+T(100,84,8,'RESCUE')+'</svg>';
+    if(k==='catcher') return '<svg viewBox="0 0 200 160"><path d="M36 146 L104 78" stroke="'+L+'" stroke-width="8" stroke-linecap="round"/><path d="M36 146 L104 78" stroke="#FF6FAE" stroke-width="3" stroke-linecap="round"/><ellipse cx="124" cy="62" rx="30" ry="26" fill="rgba(255,255,255,.6)" stroke="'+L+'" stroke-width="4"/>'+sp('translate(112,48)',.12,{body:L,accent:'#FF6FAE',jumper:true})+'</svg>';
+    return '';
   }
   document.getElementById('shopGrid').innerHTML=products.map(function(p,i){
     return '<article class="item" style="--bg:'+p.bg+'"><div class="shot">'+productArt(p.k)+(p.tag?'<span class="tag">'+p.tag+'</span>':'')+'</div><div class="info"><h4>'+p.n+'</h4><p>'+p.d+'</p><div class="buy"><span class="soon">Coming soon</span></div></div></article>';
