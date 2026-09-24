@@ -164,6 +164,9 @@ section{padding-block:64px 8px}
 .card .pic{position:relative}
 .swap{position:absolute;top:8px;right:8px;border:2px solid #2A1636;background:#FFFDF3;color:#2A1636;border-radius:999px;font-size:13px;font-weight:800;padding:2px 10px;cursor:pointer}
 .swap:hover{background:#FFE872}
+.vibes-row{display:flex;gap:4px;flex-wrap:wrap;min-width:0}
+.vibe{font-family:var(--hand);font-weight:700;font-size:15px;line-height:1.3;background:var(--ground-2);border:1.5px solid var(--line);border-radius:999px;padding:0 8px;white-space:nowrap}
+.card .sci{white-space:nowrap}
 .example-note{font-family:var(--hand);font-size:20px;color:var(--ink-soft);margin:0 0 14px}
 .slot-note{position:absolute;bottom:8px;left:8px;right:8px;text-align:center;background:rgba(255,253,243,.9);color:#2A1636;border-radius:999px;font-family:var(--hand);font-size:16px;font-weight:700;padding:2px 8px}
 .card .tape{position:absolute;top:-12px;left:50%;width:74px;height:22px;margin-left:-37px;background:var(--pink);opacity:.8;transform:rotate(-4deg);border-radius:2px}
@@ -458,26 +461,40 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     {bg:'#FFB38A',body:'#2B2B2B',accent:'#2FAE6E'}
   ];
   var spoods=[
-    {name:'Mama Legs',sp:'Wolf spider + ~40 babies',where:'in the grass, on a school run',f:'fuzzy',legs:8,boops:4812,p:3,fuzz:true,jumper:false,slot:'mama',
+    {name:'Mama Legs',sp:'Wolf spider + ~40 babies',where:'in the grass, on a school run',f:'fuzzy',vibes:['fuzzy','majestic'],boops:4812,p:3,fuzz:true,jumper:false,slot:'mama',
      title:'Mama Legs &amp; the Forty Kids',latin:'Wolf spider · family <i>Lycosidae</i> · carrying the whole brood',
      quote:'Spotted her in the grass giving roughly forty babies a piggyback ride. She did not ask for help. She is a legend.',
      facts:[['Passengers','~40'],['Eyes','8 (+320)']]},
-    {name:'Queen Stripes',sp:'Yellow garden spider',where:'in her web, wrapping lunch',f:'orb',legs:8,boops:3377,p:2,jumper:false,slot:'queen'},
-    {name:'Peaches',sp:'Jumping spider',where:'on a leaf, being a bean',f:'jumper tiny',legs:8,boops:2941,p:1,jumper:true,slot:'peaches'},
-    {name:'Gerald',sp:'Bold jumping spider',where:'bathroom ceiling, judging me',f:'jumper',legs:8,boops:1204,p:0,jumper:true},
-    {name:'Beans',sp:'Wolf spider',where:'garage, very fast',f:'fuzzy',legs:8,boops:873,p:3,fuzz:true,jumper:false},
-    {name:'Lady Charlotte',sp:'Marbled orb weaver',where:'porch light, every night',f:'orb',legs:8,boops:2210,p:1,jumper:false},
-    {name:'Lil Pepper',sp:'Zebra jumping spider',where:'on my laptop, mid-meeting',f:'tiny jumper',legs:8,boops:661,p:2,jumper:true},
-    {name:'Big Doug',sp:'Mexican red-knee tarantula',where:'his tank (his name is Doug)',f:'fuzzy',legs:8,boops:3150,p:5,fuzz:true,jumper:false},
-    {name:'Noodle',sp:'Cellar spider',where:'corner of the basement',f:'tiny',legs:7,boops:402,p:4,jumper:false},
-    {name:'Professor Fuzz',sp:'Tan jumping spider',where:'the fence post, lecturing',f:'jumper fuzzy',legs:8,boops:1588,p:3,fuzz:true,jumper:true},
-    {name:'Stitch',sp:'Garden orb weaver',where:'between two sunflowers',f:'orb',legs:8,boops:977,p:2,jumper:false}
+    {name:'Queen Stripes',sp:'Yellow garden spider',where:'in her web, wrapping lunch',f:'orb',vibes:['majestic','menacing (lovingly)'],boops:3377,p:2,jumper:false,slot:'queen'},
+    {name:'Peaches',sp:'Jumping spider',where:'on a leaf, being a bean',f:'jumper tiny',vibes:['smol','derpy'],boops:2941,p:1,jumper:true,slot:'peaches'},
+    {name:'Gerald',sp:'Bold jumping spider',where:'bathroom ceiling, judging me',f:'jumper',vibes:['menacing (lovingly)'],boops:1204,p:0,jumper:true},
+    {name:'Beans',sp:'Wolf spider',where:'garage, very fast',f:'fuzzy',vibes:['fuzzy'],boops:873,p:3,fuzz:true,jumper:false},
+    {name:'Lady Charlotte',sp:'Marbled orb weaver',where:'porch light, every night',f:'orb',vibes:['majestic'],boops:2210,p:1,jumper:false},
+    {name:'Lil Pepper',sp:'Zebra jumping spider',where:'on my laptop, mid-meeting',f:'tiny jumper',vibes:['smol'],boops:661,p:2,jumper:true},
+    {name:'Big Doug',sp:'Mexican red-knee tarantula',where:'his tank (his name is Doug)',f:'fuzzy',vibes:['fuzzy','majestic'],boops:3150,p:5,fuzz:true,jumper:false},
+    {name:'Noodle',sp:'Cellar spider',where:'corner of the basement',f:'tiny',vibes:['derpy'],boops:402,p:4,jumper:false},
+    {name:'Professor Fuzz',sp:'Tan jumping spider',where:'the fence post, lecturing',f:'jumper fuzzy',vibes:['fuzzy','derpy'],boops:1588,p:3,fuzz:true,jumper:true},
+    {name:'Stitch',sp:'Garden orb weaver',where:'between two sunflowers',f:'orb',vibes:['smol'],boops:977,p:2,jumper:false}
   ];
   var tilts=['-2.5deg','1.8deg','-1deg','2.6deg','-1.8deg','1deg','-2.2deg','2deg'];
   var grid=document.getElementById('grid');
   var currentFilter='all';
 
-  function legDots(n){var s='<span class="legs" aria-label="'+n+' of 8 legs visible">';for(var i=0;i<8;i++)s+='<i class="'+(i<n?'on':'')+'"></i>';return s+'</span>';}
+  var FAMILIES={'Jumping spider':'Salticidae','Orb weaver':'Araneidae','Wolf spider':'Lycosidae','Tarantula':'Theraphosidae','Fishing or nursery web spider':'Pisauridae','Huntsman spider':'Sparassidae','Crab spider':'Thomisidae','Lynx spider':'Oxyopidae'};
+  function sciFor(name){
+    if(!name||typeof SPECIES==='undefined') return '';
+    var n=name.toLowerCase();
+    for(var i=0;i<SPECIES.length;i++){
+      var hit=SPECIES[i].list.filter(function(x){return x[0].toLowerCase()===n;})[0];
+      if(hit) return hit[1]||'';
+    }
+    for(var kind in FAMILIES) if(n.indexOf(kind.toLowerCase())===0) return 'family '+FAMILIES[kind];
+    return '';
+  }
+  function vibeTags(v){
+    v=(v||[]).slice(0,2);
+    return '<span class="vibes-row">'+v.map(function(x){return '<span class="vibe">'+esc(x)+'</span>';}).join('')+'</span>';
+  }
   function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 
   function cardHTML(s,i){
@@ -487,8 +504,8 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
       (s.fresh?'<span class="new-sticker">fresh!</span>':'<span class="tape" aria-hidden="true"></span>')+
       '<div class="pic">'+pic+'</div>'+
       '<h4>'+esc(s.name)+'</h4>'+
-      '<p class="sp">'+esc(s.sp)+' · found '+esc(s.where)+'</p>'+
-      '<div class="row">'+legDots(s.legs)+'<button class="boop" type="button" aria-label="Boop '+esc(s.name)+'">boop · <span>'+s.boops.toLocaleString()+'</span></button></div>'+
+      '<p class="sp">'+esc(s.sp)+(sciFor(s.sp)?' <i class="sci">'+sciFor(s.sp)+'</i>':'')+' · found '+esc(s.where)+'</p>'+
+      '<div class="row">'+vibeTags(s.vibes)+'<button class="boop" type="button" aria-label="Boop '+esc(s.name)+'">boop · <span>'+s.boops.toLocaleString()+'</span></button></div>'+
     '</article>';
   }
   function render(){
@@ -525,7 +542,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   function loadLive(){
     if(!sb) return;
     sb.from('spood_submissions')
-      .select('id,name,species,where_found,filter_tags,photo_path,boops,featured_story,created_at')
+      .select('id,name,species,where_found,filter_tags,vibes,photo_path,boops,featured_story,created_at')
       .order('created_at',{ascending:false}).limit(200)
       .then(function(res){
         if(res.error){console.warn('spoods',res.error);return;}
@@ -536,7 +553,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
           (u.data||[]).forEach(function(x){if(x.signedUrl) urls[x.path]=x.signedUrl;});
           var twoDays=2*24*60*60*1000;
           spoods=rows.map(function(x){return {
-            id:x.id,name:x.name,sp:x.species,where:x.where_found,f:x.filter_tags||'all',legs:8,boops:x.boops,
+            id:x.id,name:x.name,sp:x.species,where:x.where_found,f:x.filter_tags||'all',vibes:x.vibes,boops:x.boops,
             p:paletteFor(x.id),img:urls[x.photo_path],quote:x.featured_story,
             fresh:Date.now()-new Date(x.created_at).getTime()<twoDays
           };});
@@ -579,7 +596,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     if(champ.img){var im=new Image();im.src=champ.img;im.alt='Photo of '+champ.name;sotdArt.appendChild(im);}
     else sotdArt.insertAdjacentHTML('beforeend',spoodSVG({body:pal.body,accent:pal.accent,fuzz:champ.fuzz,jumper:champ.jumper,thread:true}));
     document.getElementById('sotdName').innerHTML=champ.title||esc(champ.name);
-    document.getElementById('sotdLatin').innerHTML=champ.latin||esc(champ.sp);
+    document.getElementById('sotdLatin').innerHTML=champ.latin||(esc(champ.sp)+(sciFor(champ.sp)?' · <i>'+sciFor(champ.sp)+'</i>':''));
     document.getElementById('sotdQuote').textContent='“'+(champ.quote||('Found '+champ.where+'.'))+'”';
     var facts=(champ.facts||[['Found',esc(champ.where)]]).concat([['Boops',champ.boops.toLocaleString()]]);
     document.getElementById('sotdFacts').innerHTML=facts.map(function(f){return '<div><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>';}).join('');
@@ -671,36 +688,37 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
   formFile.addEventListener('change',function(){setPending(formFile.files[0]);});
   // Species picker: pick a kind first, then (optionally) type or choose the exact species.
   // Suggestions only show for the chosen kind, so big groups like tarantulas stay manageable.
+  // Each entry is [common name, scientific name]. A lone genus means the common name covers several species.
   var SPECIES=[
-    {kind:"Jumping spider",f:"jumper",list:["Bold jumping spider", "Regal jumping spider", "Red-backed jumping spider", "Johnson jumping spider", "Apache jumping spider", "Cardinal jumping spider", "Brilliant jumping spider", "Canopy jumping spider", "Putnam’s jumping spider", "Emerald jumping spider", "Zebra jumping spider", "Tan jumping spider", "Twin-flagged jumping spider", "Dimorphic jumping spider", "Hentz jumping spider", "White-jawed jumping spider", "Magnolia green jumper", "Gray wall jumper", "Fence-post jumping spider", "Pantropical jumper", "Adanson’s house jumper", "Ant-mimic jumping spider", "Peacock spider", "Giant jumping spider", "Sylvan jumping spider", "Green jumping spider", "Portia spider", "Vegetarian jumping spider"]},
-    {kind:"Orb weaver",f:"orb",list:["Yellow garden spider", "Banded garden spider", "Silver argiope", "Wasp spider", "St Andrew’s cross spider", "Cross orb weaver", "Marbled orb weaver", "Spotted orb weaver", "Western spotted orb weaver", "Barn spider", "Shamrock orb weaver", "Six-spotted orb weaver", "Star-bellied orb weaver", "Lined orb weaver", "Humped orb weaver", "Golden silk orb weaver", "Joro spider", "Spiny-backed orb weaver", "Arrowhead orb weaver", "Orchard orb weaver", "Basilica orb weaver", "Long-jawed orb weaver", "Trashline orb weaver", "Bolas spider", "Darwin’s bark spider", "Cat-faced spider", "Four-spotted orb weaver", "Furrow orb weaver", "Bridge orb weaver", "Hentz orb weaver", "Tropical orb weaver", "Garden orb weaver", "Golden orb weaver", "Leaf-curling spider", "Christmas spider"]},
-    {kind:"Wolf spider",f:"fuzzy",list:["Carolina wolf spider", "Rabid wolf spider", "Forest wolf spider", "Tiger wolf spider", "Thin-legged wolf spider", "Pirate wolf spider", "Brush-legged wolf spider", "Burrowing wolf spider", "Garden wolf spider", "Beach wolf spider", "Tarantula wolf spider"]},
-    {kind:"Tarantula",f:"fuzzy",list:["Mexican red-knee", "Mexican red-leg", "Mexican fireleg", "Mexican golden red rump", "Mexican rose grey", "Mexican pink", "Chilean rose", "Chaco golden knee", "Brazilian black", "Brazilian red and white", "Brazilian salmon pink birdeater", "Brazilian giant white knee", "Brazilian blue", "Goliath birdeater", "Burgundy goliath birdeater", "Goliath pinkfoot", "Colombian giant redleg", "Colombian purple bloom", "Bolivian blueleg", "Peruvian green velvet", "Venezuelan suntiger", "Trinidad chevron", "Trinidad olive", "Skeleton tarantula", "Pinktoe", "Antilles pinktoe", "Amazon sapphire pinktoe", "Honduran curly hair", "Costa Rican zebra", "Costa Rican tiger rump", "Guatemalan tiger rump", "Panama blonde", "Green bottle blue", "Cobalt blue", "Thai black", "Singapore blue", "Gooty sapphire ornamental", "Indian ornamental", "Ivory ornamental", "Fringed ornamental", "Sri Lankan ornamental", "Orange baboon", "King baboon", "Horned baboon", "Straight-horned baboon", "Starburst baboon", "Feather leg baboon", "Socotra Island blue baboon", "Pumpkin patch", "Texas brown", "Oklahoma brown", "Arizona blonde", "Mexican blood leg", "Mexican red rump", "Mexican black velvet", "Guatemalan red rump", "Brazilian black and white", "Brazilian giant blonde", "Brazilian jewel", "Pink zebra beauty", "Chilean flame", "Haitian brown", "Cuban bronze", "Purple pinktoe", "Metallic pinktoe", "Purple tree spider", "Orange tree spider", "Rio Grande gold", "Texas tan", "Grand Canyon black", "California ebony", "Cameroon red baboon", "Togo starburst", "Chinese golden earth tiger", "Thai zebra", "Indian violet", "Philippine orange", "Mysore ornamental", "Red slate ornamental", "Salem ornamental", "Bengal ornamental", "Wessel’s tiger ornamental", "Queensland whistling tarantula"]},
-    {kind:"Fishing or nursery web spider",f:"fuzzy",list:["Dark fishing spider", "Six-spotted fishing spider", "Striped fishing spider", "White-banded fishing spider", "Nursery web spider", "Raft spider", "Great raft spider"]},
-    {kind:"Huntsman spider",f:"fuzzy",list:["Pantropical huntsman", "Giant huntsman", "Badge huntsman", "Banded huntsman", "Green huntsman", "Golden wheel spider", "Social huntsman", "Brown huntsman"]},
-    {kind:"Crab spider",f:"tiny",list:["Goldenrod crab spider", "White-banded crab spider", "Green crab spider", "Northern crab spider", "Ground crab spider", "Bark crab spider", "Running crab spider", "Flower crab spider"]},
-    {kind:"Lynx spider",f:"all",list:["Green lynx spider", "Striped lynx spider", "Western lynx spider"]},
-    {kind:"House or cobweb spider",f:"tiny",list:["Common house spider", "Giant house spider", "Domestic house spider", "Cellar spider (daddy long-legs)", "Marbled cellar spider", "Triangulate cobweb spider", "False widow", "Noble false widow", "Yellow sac spider", "Spitting spider", "Woodlouse spider", "Cupboard spider", "Black house spider", "Missing sector orb weaver", "Tube web spider", "Lace-web spider"]},
-    {kind:"Sheet or funnel web spider",f:"all",list:["Grass spider", "Barn funnel weaver", "Bowl and doily spider", "Filmy dome spider", "Hammock spider", "Hacklemesh weaver"]},
-    {kind:"Widow, recluse or spicy spider",f:"all",list:["Southern black widow", "Northern black widow", "Western black widow", "Brown widow", "Red widow", "Redback spider", "Brown recluse", "Mediterranean recluse", "Chilean recluse", "Hobo spider", "Sydney funnel-web spider", "Katipō", "Black button spider", "Desert recluse", "Brazilian wandering spider"]},
-    {kind:"Trapdoor or ground spider",f:"fuzzy",list:["Trapdoor spider", "Brushed trapdoor spider", "Wishbone spider", "Mouse spider", "Purseweb spider", "Ground spider", "Parson spider", "California trapdoor spider", "Cork-lid trapdoor spider"]},
-    {kind:"Weird & wonderful",f:"all",list:["Ogre-faced (net-casting) spider", "Bird-dropping spider", "Ladybird spider", "Diving bell spider", "Pirate spider", "Two-tailed spider", "Scorpion-tailed spider", "Mirror spider", "Pelican spider", "Happy face spider", "Six-eyed sand spider"]}
+    {kind:"Jumping spider",f:"jumper",list:[["Bold jumping spider", "Phidippus audax"], ["Regal jumping spider", "Phidippus regius"], ["Red-backed jumping spider", "Phidippus johnsoni"], ["Apache jumping spider", "Phidippus apacheanus"], ["Cardinal jumping spider", "Phidippus cardinalis"], ["Brilliant jumping spider", "Phidippus clarus"], ["Canopy jumping spider", "Phidippus otiosus"], ["Putnam’s jumping spider", "Phidippus putnami"], ["Emerald jumping spider", "Paraphidippus aurantius"], ["Zebra jumping spider", "Salticus scenicus"], ["Tan jumping spider", "Platycryptus undatus"], ["Twin-flagged jumping spider", "Anasaitis canosa"], ["Dimorphic jumping spider", "Maevia inclemens"], ["Hentz jumping spider", "Hentzia palmarum"], ["White-jawed jumping spider", "Hentzia mitrata"], ["Magnolia green jumper", "Lyssomanes viridis"], ["Gray wall jumper", "Menemerus bivittatus"], ["Fence-post jumping spider", "Marpissa muscosa"], ["Pantropical jumper", "Plexippus paykulli"], ["Adanson’s house jumper", "Hasarius adansoni"], ["Sylvan jumping spider", "Colonus sylvanus"], ["Giant jumping spider", "Hyllus giganteus"], ["Green jumping spider", "Mopsus mormon"], ["Ant-mimic jumping spider", "Myrmarachne"], ["Peacock spider", "Maratus"], ["Portia spider", "Portia"], ["Vegetarian jumping spider", "Bagheera kiplingi"]]},
+    {kind:"Orb weaver",f:"orb",list:[["Yellow garden spider", "Argiope aurantia"], ["Banded garden spider", "Argiope trifasciata"], ["Silver argiope", "Argiope argentata"], ["Wasp spider", "Argiope bruennichi"], ["St Andrew’s cross spider", "Argiope keyserlingi"], ["Cross orb weaver", "Araneus diadematus"], ["Marbled orb weaver", "Araneus marmoreus"], ["Cat-faced spider", "Araneus gemmoides"], ["Barn spider", "Araneus cavaticus"], ["Shamrock orb weaver", "Araneus trifolium"], ["Four-spotted orb weaver", "Araneus quadratus"], ["Six-spotted orb weaver", "Araniella displicata"], ["Spotted orb weaver", "Neoscona crucifera"], ["Western spotted orb weaver", "Neoscona oaxacensis"], ["Furrow orb weaver", "Larinioides cornutus"], ["Bridge orb weaver", "Larinioides sclopetarius"], ["Star-bellied orb weaver", "Acanthepeira stellata"], ["Lined orb weaver", "Mangora gibberosa"], ["Humpbacked orb weaver", "Eustala anastera"], ["Arrowhead orb weaver", "Verrucosa arenata"], ["Tropical orb weaver", "Eriophora ravilla"], ["Golden silk orb weaver", "Trichonephila clavipes"], ["Joro spider", "Trichonephila clavata"], ["Spiny-backed orb weaver", "Gasteracantha cancriformis"], ["Orchard orb weaver", "Leucauge venusta"], ["Basilica orb weaver", "Mecynogea lemniscata"], ["Long-jawed orb weaver", "Tetragnatha"], ["Trashline orb weaver", "Cyclosa"], ["Bolas spider", "Mastophora"], ["Darwin’s bark spider", "Caerostris darwini"], ["Leaf-curling spider", "Phonognatha graeffei"], ["Christmas spider", "Austracantha minax"]]},
+    {kind:"Wolf spider",f:"fuzzy",list:[["Carolina wolf spider", "Hogna carolinensis"], ["Rabid wolf spider", "Rabidosa rabida"], ["Tiger wolf spider", "Tigrosa aspersa"], ["Thin-legged wolf spider", "Pardosa"], ["Pirate wolf spider", "Pirata"], ["Brush-legged wolf spider", "Schizocosa"], ["Burrowing wolf spider", "Geolycosa"], ["Beach wolf spider", "Arctosa littoralis"], ["Garden wolf spider", "Tasmanicosa godeffroyi"], ["Tarantula wolf spider", "Lycosa tarantula"]]},
+    {kind:"Tarantula",f:"fuzzy",list:[["Mexican red-knee", "Brachypelma hamorii"], ["Mexican red-leg", "Brachypelma emilia"], ["Mexican fireleg", "Brachypelma boehmei"], ["Mexican golden red rump", "Brachypelma albiceps"], ["Mexican pink", "Brachypelma klaasi"], ["Mexican red rump", "Tliltocatl vagans"], ["Mexican black velvet", "Tliltocatl schroederi"], ["Mexican rose grey", "Tliltocatl verdezi"], ["Honduran curly hair", "Tliltocatl albopilosus"], ["Guatemalan red rump", "Tliltocatl sabulosus"], ["Mexican blood leg", "Aphonopelma bicoloratum"], ["Texas brown", "Aphonopelma hentzi"], ["Texas tan", "Aphonopelma anax"], ["Rio Grande gold", "Aphonopelma moderatum"], ["Arizona blonde", "Aphonopelma chalcodes"], ["Grand Canyon black", "Aphonopelma marxi"], ["California ebony", "Aphonopelma eutylenum"], ["Costa Rican zebra", "Aphonopelma seemanni"], ["Costa Rican tiger rump", "Cyclosternum fasciatum"], ["Guatemalan tiger rump", "Davus pentaloris"], ["Panama blonde", "Psalmopoeus pulcher"], ["Venezuelan suntiger", "Psalmopoeus irminia"], ["Trinidad chevron", "Psalmopoeus cambridgei"], ["Trinidad olive", "Neoholothele incei"], ["Chilean rose", "Grammostola rosea"], ["Chaco golden knee", "Grammostola pulchripes"], ["Brazilian black", "Grammostola pulchra"], ["Chilean flame", "Euathlus"], ["Brazilian red and white", "Nhandu chromatus"], ["Brazilian black and white", "Nhandu coloratovillosus"], ["Brazilian giant blonde", "Nhandu tripepii"], ["Brazilian salmon pink birdeater", "Lasiodora parahybana"], ["Brazilian giant white knee", "Acanthoscurria geniculata"], ["Brazilian blue", "Pterinopelma sazimai"], ["Brazilian jewel", "Typhochlaena seladonia"], ["Pink zebra beauty", "Eupalaestrus campestratus"], ["Goliath birdeater", "Theraphosa blondi"], ["Burgundy goliath birdeater", "Theraphosa stirmi"], ["Goliath pinkfoot", "Theraphosa apophysis"], ["Colombian giant redleg", "Megaphobema robustum"], ["Colombian purple bloom", "Xenesthis immanis"], ["Bolivian blueleg", "Pamphobeteus antinous"], ["Peruvian green velvet", "Thrixopelma ockerti"], ["Skeleton tarantula", "Ephebopus murinus"], ["Pumpkin patch", "Hapalopus formosus"], ["Green bottle blue", "Chromatopelma cyaneopubescens"], ["Pinktoe", "Avicularia avicularia"], ["Purple pinktoe", "Avicularia purpurea"], ["Metallic pinktoe", "Avicularia metallica"], ["Antilles pinktoe", "Caribena versicolor"], ["Amazon sapphire pinktoe", "Avicularia"], ["Purple tree spider", "Tapinauchenius violaceus"], ["Orange tree spider", "Tapinauchenius gigas"], ["Haitian brown", "Phormictopus cancerides"], ["Cuban bronze", "Phormictopus"], ["Orange baboon", "Pterinochilus murinus"], ["King baboon", "Pelinobius muticus"], ["Horned baboon", "Ceratogyrus darlingi"], ["Straight-horned baboon", "Ceratogyrus marshalli"], ["Feather leg baboon", "Stromatopelma calceatum"], ["Togo starburst", "Heteroscodra maculata"], ["Cameroon red baboon", "Hysterocrates gigas"], ["Socotra Island blue baboon", "Monocentropus balfouri"], ["Cobalt blue", "Cyriopagopus lividus"], ["Thai black", "Cyriopagopus minax"], ["Thai zebra", "Cyriopagopus albostriatus"], ["Chinese golden earth tiger", "Cyriopagopus schmidti"], ["Singapore blue", "Omothymus violaceopes"], ["Indian violet", "Chilobrachys fimbriatus"], ["Philippine orange", "Orphnaecus philippinus"], ["Gooty sapphire ornamental", "Poecilotheria metallica"], ["Indian ornamental", "Poecilotheria regalis"], ["Ivory ornamental", "Poecilotheria subfusca"], ["Fringed ornamental", "Poecilotheria ornata"], ["Sri Lankan ornamental", "Poecilotheria fasciata"], ["Mysore ornamental", "Poecilotheria striata"], ["Red slate ornamental", "Poecilotheria rufilata"], ["Salem ornamental", "Poecilotheria formosa"], ["Bengal ornamental", "Poecilotheria miranda"], ["Wessel’s tiger ornamental", "Poecilotheria tigrinawesseli"], ["Queensland whistling tarantula", "Phlogius crassipes"]]},
+    {kind:"Fishing or nursery web spider",f:"fuzzy",list:[["Dark fishing spider", "Dolomedes tenebrosus"], ["Six-spotted fishing spider", "Dolomedes triton"], ["Striped fishing spider", "Dolomedes scriptus"], ["White-banded fishing spider", "Dolomedes albineus"], ["Raft spider", "Dolomedes fimbriatus"], ["Great raft spider", "Dolomedes plantarius"], ["Nursery web spider", "Pisaurina mira"]]},
+    {kind:"Huntsman spider",f:"fuzzy",list:[["Pantropical huntsman", "Heteropoda venatoria"], ["Giant huntsman", "Heteropoda maxima"], ["Social huntsman", "Delena cancerides"], ["Badge huntsman", "Neosparassus"], ["Banded huntsman", "Holconia"], ["Green huntsman", "Micrommata virescens"], ["Golden wheel spider", "Carparachne aureoflava"]]},
+    {kind:"Crab spider",f:"tiny",list:[["Goldenrod crab spider", "Misumena vatia"], ["White-banded crab spider", "Misumenoides formosipes"], ["Northern crab spider", "Mecaphesa asperata"], ["Green crab spider", "Diaea dorsata"], ["Ground crab spider", "Xysticus"], ["Running crab spider", "Philodromus"]]},
+    {kind:"Lynx spider",f:"all",list:[["Green lynx spider", "Peucetia viridans"], ["Striped lynx spider", "Oxyopes salticus"], ["Western lynx spider", "Oxyopes scalaris"]]},
+    {kind:"House or cobweb spider",f:"tiny",list:[["Common house spider", "Parasteatoda tepidariorum"], ["Barn funnel weaver (domestic house spider)", "Tegenaria domestica"], ["Giant house spider", "Eratigena atrica"], ["Cellar spider (daddy long-legs)", "Pholcus phalangioides"], ["Marbled cellar spider", "Holocnemus pluchei"], ["Triangulate cobweb spider", "Steatoda triangulosa"], ["Cupboard spider (false widow)", "Steatoda grossa"], ["Noble false widow", "Steatoda nobilis"], ["Black house spider", "Badumna insignis"], ["Missing sector orb weaver", "Zygiella x-notata"], ["Tube web spider", "Segestria florentina"], ["Lace-web spider", "Amaurobius"], ["Yellow sac spider", "Cheiracanthium"], ["Spitting spider", "Scytodes thoracica"], ["Woodlouse spider", "Dysdera crocata"]]},
+    {kind:"Sheet or funnel web spider",f:"all",list:[["Grass spider", "Agelenopsis"], ["Bowl and doily spider", "Frontinella pyramitela"], ["Filmy dome spider", "Neriene radiata"], ["Hammock spider", "Pityohyphantes costatus"], ["Hacklemesh weaver", "Callobius"]]},
+    {kind:"Widow, recluse or spicy spider",f:"all",list:[["Southern black widow", "Latrodectus mactans"], ["Northern black widow", "Latrodectus variolus"], ["Western black widow", "Latrodectus hesperus"], ["Brown widow", "Latrodectus geometricus"], ["Red widow", "Latrodectus bishopi"], ["Redback spider", "Latrodectus hasselti"], ["Katipō", "Latrodectus katipo"], ["Black button spider", "Latrodectus indistinctus"], ["Brown recluse", "Loxosceles reclusa"], ["Mediterranean recluse", "Loxosceles rufescens"], ["Chilean recluse", "Loxosceles laeta"], ["Desert recluse", "Loxosceles deserta"], ["Hobo spider", "Eratigena agrestis"], ["Sydney funnel-web spider", "Atrax robustus"], ["Brazilian wandering spider", "Phoneutria"]]},
+    {kind:"Trapdoor or ground spider",f:"fuzzy",list:[["Trapdoor spider"], ["California trapdoor spider", "Bothriocyrtum californicum"], ["Mouse spider", "Missulena"], ["Purseweb spider", "Sphodros"], ["Parson spider", "Herpyllus ecclesiasticus"], ["Ground spider"]]},
+    {kind:"Weird & wonderful",f:"all",list:[["Ogre-faced (net-casting) spider", "Deinopis"], ["Ladybird spider", "Eresus"], ["Diving bell spider", "Argyroneta aquatica"], ["Pirate spider", "Mimetus"], ["Two-tailed spider", "Hersilia"], ["Scorpion-tailed spider", "Arachnura higginsi"], ["Mirror spider", "Thwaitesia"], ["Happy face spider", "Theridion grallator"], ["Six-eyed sand spider", "Hexophthalma hahni"], ["Bird-dropping spider"]]}
   ];
   var speciesSel=document.getElementById('species'), speciesOtherWrap=document.getElementById('speciesOtherWrap');
   var speciesOther=document.getElementById('speciesOther'), speciesList=document.getElementById('speciesList');
   var otherOpt=document.createElement('option');otherOpt.value='other';otherOpt.textContent='Type it in myself';speciesSel.appendChild(otherOpt);
   var HINTS={'Orb weaver':'Orb weaver (garden spiders, big round webs)'};
   SPECIES.forEach(function(k,i){var o=document.createElement('option');o.value=String(i);o.textContent=HINTS[k.kind]||k.kind;speciesSel.appendChild(o);});
-  var ALL=[];SPECIES.forEach(function(k){k.list.forEach(function(n){ALL.push({name:n,f:k.f});});});
+  var ALL=[];SPECIES.forEach(function(k){k.list.forEach(function(n){ALL.push({name:n[0],sci:n[1]||'',f:k.f});});});
   function chosenKind(){return /^\d+$/.test(speciesSel.value)?SPECIES[+speciesSel.value]:null;}
   speciesSel.addEventListener('change',function(){
     var k=chosenKind(), other=speciesSel.value==='other';
     speciesOther.value='';
     speciesOtherWrap.hidden=!k&&!other;
-    var names=k?k.list:other?ALL.map(function(x){return x.name;}):[];
-    speciesList.innerHTML=names.map(function(n){return '<option value="'+n+'"></option>';}).join('');
+    var opts=k?k.list.map(function(n){return {name:n[0],sci:n[1]||''};}):other?ALL:[];
+    speciesList.innerHTML=opts.map(function(x){return '<option value="'+x.name+'" label="'+x.sci+'"></option>';}).join('');
     document.getElementById('speciesOtherLabel').textContent=other?'What kind of spider is it?':'Which one? (optional)';
-    speciesOther.placeholder=other?'start typing, e.g. garden':k?'e.g. '+k.list[0]+' (or leave blank)':'';
+    speciesOther.placeholder=other?'start typing, e.g. garden':k?'e.g. '+k.list[0][0]+' (or leave blank)':'';
   });
   function chosenSpecies(){
     var typed=speciesOther.value.trim().slice(0,80), k=chosenKind();
