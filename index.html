@@ -367,14 +367,69 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
           <label for="species">Species (if known)
             <select id="species">
               <option value="Mystery spood">No clue, just vibes</option>
-              <option value="Jumping spider" data-f="jumper">Jumping spider</option>
-              <option value="Orb weaver" data-f="orb">Orb weaver</option>
-              <option value="Wolf spider" data-f="fuzzy">Wolf spider</option>
-              <option value="Cellar spider" data-f="tiny">Cellar spider</option>
-              <option value="Tarantula" data-f="fuzzy">Tarantula</option>
+              <optgroup label="Jumping spiders">
+                <option value="Jumping spider (not sure which)" data-f="jumper">Jumping spider (not sure which)</option>
+                <option value="Bold jumping spider" data-f="jumper">Bold jumping spider</option>
+                <option value="Regal jumping spider" data-f="jumper">Regal jumping spider</option>
+                <option value="Zebra jumping spider" data-f="jumper">Zebra jumping spider</option>
+                <option value="Tan jumping spider" data-f="jumper">Tan jumping spider</option>
+                <option value="Twin-flagged jumping spider" data-f="jumper">Twin-flagged jumping spider</option>
+                <option value="Magnolia green jumper" data-f="jumper">Magnolia green jumper</option>
+                <option value="Ant-mimic jumping spider" data-f="jumper">Ant-mimic jumping spider</option>
+                <option value="Peacock spider" data-f="jumper tiny">Peacock spider</option>
+              </optgroup>
+              <optgroup label="Orb weavers">
+                <option value="Orb weaver (not sure which)" data-f="orb">Orb weaver (not sure which)</option>
+                <option value="Yellow garden spider" data-f="orb">Yellow garden spider</option>
+                <option value="Banded garden spider" data-f="orb">Banded garden spider</option>
+                <option value="Cross orb weaver" data-f="orb">Cross orb weaver</option>
+                <option value="Marbled orb weaver" data-f="orb">Marbled orb weaver</option>
+                <option value="Spotted orb weaver" data-f="orb">Spotted orb weaver</option>
+                <option value="Barn spider" data-f="orb">Barn spider</option>
+                <option value="Golden silk orb weaver" data-f="orb">Golden silk orb weaver</option>
+                <option value="Spiny-backed orb weaver" data-f="orb tiny">Spiny-backed orb weaver</option>
+                <option value="Arrowhead orb weaver" data-f="orb">Arrowhead orb weaver</option>
+                <option value="Long-jawed orb weaver" data-f="orb">Long-jawed orb weaver</option>
+              </optgroup>
+              <optgroup label="Hunters &amp; wanderers">
+                <option value="Wolf spider" data-f="fuzzy">Wolf spider</option>
+                <option value="Fishing spider" data-f="fuzzy">Fishing spider</option>
+                <option value="Nursery web spider" data-f="fuzzy">Nursery web spider</option>
+                <option value="Huntsman spider" data-f="fuzzy">Huntsman spider</option>
+                <option value="Green lynx spider" data-f="all">Green lynx spider</option>
+                <option value="Grass spider" data-f="all">Grass spider</option>
+                <option value="Trapdoor spider" data-f="fuzzy">Trapdoor spider</option>
+              </optgroup>
+              <optgroup label="Tarantulas">
+                <option value="Tarantula (not sure which)" data-f="fuzzy">Tarantula (not sure which)</option>
+                <option value="Mexican red-knee tarantula" data-f="fuzzy">Mexican red-knee tarantula</option>
+                <option value="Texas brown tarantula" data-f="fuzzy">Texas brown tarantula</option>
+                <option value="Chilean rose tarantula" data-f="fuzzy">Chilean rose tarantula</option>
+                <option value="Pinktoe tarantula" data-f="fuzzy">Pinktoe tarantula</option>
+              </optgroup>
+              <optgroup label="Crab spiders">
+                <option value="Goldenrod crab spider" data-f="tiny">Goldenrod crab spider</option>
+                <option value="White-banded crab spider" data-f="tiny">White-banded crab spider</option>
+                <option value="Running crab spider" data-f="tiny">Running crab spider</option>
+              </optgroup>
+              <optgroup label="House &amp; cobweb spiders">
+                <option value="Cellar spider (daddy long-legs)" data-f="tiny">Cellar spider (daddy long-legs)</option>
+                <option value="Common house spider" data-f="tiny">Common house spider</option>
+                <option value="Triangulate cobweb spider" data-f="tiny">Triangulate cobweb spider</option>
+                <option value="False widow" data-f="tiny">False widow</option>
+                <option value="Black widow" data-f="all">Black widow</option>
+                <option value="Brown widow" data-f="all">Brown widow</option>
+                <option value="Yellow sac spider" data-f="tiny">Yellow sac spider</option>
+                <option value="Brown recluse" data-f="all">Brown recluse</option>
+                <option value="Hobo spider" data-f="all">Hobo spider</option>
+              </optgroup>
+              <option value="other">Something else (type it in)</option>
             </select>
           </label>
         </div>
+        <label for="speciesOther" id="speciesOtherWrap" hidden>What kind of spood is it?
+          <input type="text" id="speciesOther" maxlength="80" placeholder="e.g. Bolas spider" autocomplete="off">
+        </label>
         <label for="where">Where’d you find them?
           <input type="text" id="where" placeholder="on the bathroom ceiling, judging me" autocomplete="off">
         </label>
@@ -711,6 +766,11 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
     fileLabel.textContent='Looking good! Tap to pick a different photo';
   }
   formFile.addEventListener('change',function(){setPending(formFile.files[0]);});
+  var speciesSel=document.getElementById('species'), speciesOtherWrap=document.getElementById('speciesOtherWrap');
+  speciesSel.addEventListener('change',function(){
+    speciesOtherWrap.hidden=speciesSel.value!=='other';
+    if(!speciesOtherWrap.hidden) document.getElementById('speciesOther').focus();
+  });
   var sendBtn=document.getElementById('sendBtn');
   document.getElementById('sendForm').addEventListener('submit',function(e){
     e.preventDefault();
@@ -729,7 +789,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         if(up.error) throw up.error;
         return sb.from('spood_submissions').insert({
           name:name.slice(0,60),
-          species:sel.value,
+          species:sel.value==='other'?(document.getElementById('speciesOther').value.trim().slice(0,80)||'Mystery spood'):sel.value,
           where_found:(document.getElementById('where').value.trim()||'somewhere glorious').slice(0,140),
           filter_tags:opt.dataset.f||'all',
           vibes:vibes,
@@ -737,7 +797,7 @@ footer{padding-block:60px 40px;display:flex;justify-content:space-between;gap:16
         });
       }).then(function(ins){if(ins.error) throw ins.error;});
     }).then(function(){
-      form.reset(); setPending(null); done();
+      form.reset(); setPending(null); speciesOtherWrap.hidden=true; done();
       say('Thanks! '+name+' is waiting for approval and will join the gallery once it’s checked.',6000);
     }).catch(function(err){
       console.warn('send failed',err); done();
